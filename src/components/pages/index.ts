@@ -1,12 +1,13 @@
 //#region > Imports
 //> Pages
 // Import all components to export them for easy access from parent components
-import HomePage from "./HomePage";
+import BasePage from "./BasePage";
+import LoginPage from "./LoginPage";
 //#endregion
 
 //#region > Exports
 //> Pages
-export { HomePage };
+export { BasePage, LoginPage };
 //#endregion
 
 /**
