@@ -148,7 +148,6 @@ class Ohrwurm extends React.Component<Props, State> {
             ]}
           ></Breadcrumbs>
         )}
-
         <MDBInput
           hint="Search"
           type="text"
@@ -203,7 +202,6 @@ class Ohrwurm extends React.Component<Props, State> {
             ></TrackTable>
           </>
         )}
-        {/* */}
       </>
     );
   }
@@ -231,6 +229,7 @@ export default withRouter(
   connect(mapStateToProps, mapDispatchToProps)(Ohrwurm)
 );
 //#endregion
+
 /**
  * SPDX-License-Identifier: (EUPL-1.2)
  * Copyright © 2019-2020 Nico Schett

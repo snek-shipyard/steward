@@ -21,7 +21,6 @@ const rootReducer = combineReducers({
   // Ohrwurm
   ohrwurm: ohrwurmReducer,
 });
-
 //#endregion
 
 //#region > Exports

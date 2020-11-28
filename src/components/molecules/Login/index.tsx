@@ -33,11 +33,6 @@ const LoginForm = (props: {
         <MDBRow className="justify-content-center">
           <MDBCol md="6">
             <MDBCard>
-              {/* <div className="header pt-3 grey lighten-2">
-                  <MDBRow className="d-flex justify-content-start">
-                    <h3 className="deep-grey-text mt-3 mb-4 pb-1 mx-5"></h3>
-                  </MDBRow>
-                </div> */}
               <MDBCardBody className="mx-4 mt-4">
                 <MDBInput
                   id="input"
