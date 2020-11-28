@@ -51,11 +51,13 @@ const trackQueryFragment = `
 `;
 //#endregion
 
-//#region > Ohrwurm Actions
+//#region > Types
 type ohrwurmArguments = {
   getClientSnek: () => SnekClient;
 };
+//#endregion
 
+//#region > Ohrwurm Actions
 const fetchPACSAction = (
   searchQuery?: string
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
