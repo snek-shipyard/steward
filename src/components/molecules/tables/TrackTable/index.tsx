@@ -53,7 +53,7 @@ class TrackTable extends React.Component<
         attendees: (
           <>
             {attendees?.map((attendee) => (
-              <MDBChip waves>{attendee.name}</MDBChip>
+              <MDBChip className="m-1">{attendee.name}</MDBChip>
             ))}
           </>
         ),
