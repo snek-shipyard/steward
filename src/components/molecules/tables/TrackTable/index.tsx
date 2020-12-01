@@ -4,9 +4,11 @@
 import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
-import { MDBDataTableV5, MDBIcon, MDBBadge } from "mdbreact";
+import { MDBDataTableV5, MDBIcon, MDBBadge, MDBChip } from "mdbreact";
 //> Audio Player
 import ReactPlayer from "react-player";
+//> Moment
+import moment from "moment";
 
 //> Store Types
 import { Track } from "../../../../store/types";
@@ -23,7 +25,15 @@ class TrackTable extends React.Component<
   generateRows = () => {
     return this.props.entries.map((e) => {
       console.log(e);
-      const { id, title, createdAt, tags, transcript, audioFileUrl } = e;
+      const {
+        id,
+        title,
+        createdAt,
+        tags,
+        attendees,
+        transcript,
+        audioFileUrl,
+      } = e;
       return {
         id,
         name: title,
@@ -37,6 +47,13 @@ class TrackTable extends React.Component<
               >
                 {tag.name}
               </MDBBadge>
+            ))}
+          </>
+        ),
+        attendees: (
+          <>
+            {attendees?.map((attendee) => (
+              <MDBChip waves>{attendee.name}</MDBChip>
             ))}
           </>
         ),
@@ -80,6 +97,11 @@ class TrackTable extends React.Component<
       {
         label: "Tags",
         field: "tags",
+        width: 300,
+      },
+      {
+        label: "Attendees",
+        field: "attendees",
         width: 300,
       },
       {
