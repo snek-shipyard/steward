@@ -43,6 +43,11 @@ const trackQueryFragment = `
       significance
     }
   }
+  attendees {
+    ... on AttendeeBlock {
+      name
+    }
+  }
   transcript
   pac {
     ${pacQueryFragment}
