@@ -37,7 +37,7 @@ class TrackTable extends React.Component<
       return {
         id,
         name: title,
-        createdAt,
+        createdAt: moment(createdAt).calendar(),
         tags: (
           <>
             {tags?.map((tag) => (
