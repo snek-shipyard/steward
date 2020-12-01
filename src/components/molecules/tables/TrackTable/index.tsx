@@ -4,7 +4,7 @@
 import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
-import { MDBDataTableV5, MDBIcon, MDBBadge, MDBChip } from "mdbreact";
+import { MDBDataTableV5, MDBIcon, MDBBadge, MDBChip, MDBBtn } from "mdbreact";
 //> Audio Player
 import ReactPlayer from "react-player";
 //> Moment
@@ -37,15 +37,16 @@ class TrackTable extends React.Component<
       return {
         id,
         name: title,
-        createdAt,
+        createdAt: moment(createdAt).calendar(),
         tags: (
           <>
             {tags?.map((tag) => (
               <MDBBadge
                 pill
                 color={tag.significance ? tag.significance : "light"}
+                className="m-1 shadow-none"
               >
-                {tag.name}
+                <p className="mx-2 my-2">{tag.name}</p>
               </MDBBadge>
             ))}
           </>
@@ -53,17 +54,19 @@ class TrackTable extends React.Component<
         attendees: (
           <>
             {attendees?.map((attendee) => (
-              <MDBChip waves>{attendee.name}</MDBChip>
+              <MDBChip className="m-1">{attendee.name}</MDBChip>
             ))}
           </>
         ),
         transcript: (
-          <MDBIcon
-            far
-            icon="file-alt"
-            size="3x"
+          <MDBBtn
+            rounded
+            outline
+            color="primary"
             onClick={() => this.props.onTranscriptClick(e)}
-          />
+          >
+            <MDBIcon icon="file" /> Open
+          </MDBBtn>
         ),
         audio: (
           <ReactPlayer
