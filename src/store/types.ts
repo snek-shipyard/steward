@@ -72,6 +72,7 @@ export interface Track {
   createdAt: string;
   description: string;
   tags: { name: string; significance: string }[];
+  attendees: { name: string }[];
   transcript: string;
   pac: PAC;
   audioFileUrl: string;
