@@ -172,17 +172,22 @@ class Ohrwurm extends React.Component<Props, State> {
           </MDBCol>
           <MDBCol size="1">
             {this.state.activeTable === "PROJECT" ? (
-              <MDBBtn rounded outline color="success" onClick={() => alert()}>
-                Add
+              <MDBBtn flat>
+                <MDBIcon
+                  icon="plus"
+                  size="lg"
+                  className="blue-text"
+                  onClick={() => alert()}
+                />
               </MDBBtn>
             ) : (
-              <MDBBtn
-                rounded
-                outline
-                color="success"
-                onClick={() => this.toggleTrackModal()}
-              >
-                Upload
+              <MDBBtn flat>
+                <MDBIcon
+                  icon="upload"
+                  size="lg"
+                  className="blue-text"
+                  onClick={() => this.toggleTrackModal()}
+                />
               </MDBBtn>
             )}
           </MDBCol>
