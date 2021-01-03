@@ -14,6 +14,9 @@ import {
   MDBModalBody,
   MDBModalFooter,
   MDBModalHeader,
+  MDBRow,
+  MDBCol,
+  MDBBtn,
 } from "mdbreact";
 //> Redux
 import { connect } from "react-redux";
@@ -29,6 +32,7 @@ import {
 //> Components
 import { Breadcrumbs } from "../../../atoms";
 import { ProjectTable, TrackTable } from "../../../molecules";
+import { TrackModal } from "../../modals";
 //> Style Sheet
 import "./ohrwurm.scss";
 //#endregion
@@ -45,6 +49,7 @@ interface State {
   transcriptText: string;
   searchQuery?: string;
   selectedProjectIndex?: number;
+  trackModal: boolean;
 }
 interface OwnProps {}
 interface StateProps {
@@ -74,6 +79,7 @@ class Ohrwurm extends React.Component<Props, State> {
     showTranscriptModal: false,
     transcriptTitle: "",
     transcriptText: "",
+    trackModal: false,
   };
 
   componentDidMount = () => {
@@ -120,6 +126,12 @@ class Ohrwurm extends React.Component<Props, State> {
     }
   };
 
+  toggleTrackModal = () => {
+    this.setState({
+      trackModal: !this.state.trackModal,
+    });
+  };
+
   render() {
     return (
       <>
@@ -148,13 +160,33 @@ class Ohrwurm extends React.Component<Props, State> {
             ]}
           ></Breadcrumbs>
         )}
-        <MDBInput
-          hint="Search"
-          type="text"
-          value={this.state.searchQuery}
-          containerClass="active-pink active-pink-2 mt-0 mb-3"
-          onChange={(e: any) => this.search(e.target.value)}
-        />
+        <MDBRow>
+          <MDBCol size="11">
+            <MDBInput
+              hint="Search"
+              type="text"
+              value={this.state.searchQuery}
+              containerClass="active-pink active-pink-2 mt-0 mb-3"
+              onChange={(e: any) => this.search(e.target.value)}
+            />
+          </MDBCol>
+          <MDBCol size="1">
+            {this.state.activeTable === "PROJECT" ? (
+              <MDBBtn rounded outline color="success" onClick={() => alert()}>
+                Add
+              </MDBBtn>
+            ) : (
+              <MDBBtn
+                rounded
+                outline
+                color="success"
+                onClick={() => this.toggleTrackModal()}
+              >
+                Upload
+              </MDBBtn>
+            )}
+          </MDBCol>
+        </MDBRow>
 
         <MDBContainer>
           <MDBModal
@@ -202,6 +234,7 @@ class Ohrwurm extends React.Component<Props, State> {
             ></TrackTable>
           </>
         )}
+        {this.state.trackModal && <TrackModal toggle={this.toggleTrackModal} />}
       </>
     );
   }
