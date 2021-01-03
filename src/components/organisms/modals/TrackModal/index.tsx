@@ -50,6 +50,7 @@ interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
   track: Track | undefined;
+  files: any;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -94,6 +95,12 @@ class TrackModal extends React.Component<Props, State> {
         trackName: track.title,
         date: new Date(track.createdAt),
         files: track.audioFileUrl,
+      });
+    }
+
+    if (this.props.files) {
+      this.setState({
+        files: this.props.files,
       });
     }
   };

@@ -20,6 +20,8 @@ import {
 } from "mdbreact";
 //> Redux
 import { connect } from "react-redux";
+// Contains the functionality for uploading a file
+import Dropzone from "react-dropzone";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
@@ -51,6 +53,8 @@ interface State {
   selectedProjectIndex?: number;
   trackModal: boolean;
   selectedTrack: Track | undefined;
+  error: Array<any>;
+  files: any;
 }
 interface OwnProps {}
 interface StateProps {
@@ -82,6 +86,8 @@ class Ohrwurm extends React.Component<Props, State> {
     transcriptText: "",
     trackModal: false,
     selectedTrack: undefined,
+    error: [],
+    files: null,
   };
 
   componentDidMount = () => {
@@ -116,8 +122,6 @@ class Ohrwurm extends React.Component<Props, State> {
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
-    console.log(this.state.searchQuery);
-    console.log(this.state.activeTable);
 
     if (this.state.activeTable === "TRACK" && this.state.selectedProjectIndex) {
       this.props.fetchPACTracks(this.state.selectedProjectIndex, value);
@@ -148,7 +152,25 @@ class Ohrwurm extends React.Component<Props, State> {
     this.toggleTrackModal();
   };
 
+  onDrop = async (files: any) => {
+    if (files.length > 0) {
+      this.setState({
+        files,
+        error: [],
+      });
+
+      this.toggleTrackModal();
+    } else {
+      this.setState({
+        error: ["Only sound related file uploading is supported!"],
+      });
+    }
+  };
+
   render() {
+    const activeStyle = {
+      borderColor: "#2196f3",
+    };
     return (
       <>
         {this.state.activeTable === "PROJECT" ? (
@@ -245,6 +267,39 @@ class Ohrwurm extends React.Component<Props, State> {
           ></ProjectTable>
         ) : (
           <>
+            <ul className="list-group mt-2">
+              {this.state.error.length > 0 &&
+                this.state.error.map((error, i) => (
+                  <li
+                    className="list-group-item list-group-item-danger"
+                    key={i}
+                  >
+                    <h3>{error}</h3>
+                  </li>
+                ))}
+            </ul>
+            <Dropzone
+              onDrop={this.onDrop}
+              accept="audio/*"
+              noClick
+              multiple={false}
+            >
+              {({ getRootProps, getInputProps, acceptedFiles }) => (
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <TrackTable
+                    entries={
+                      this.props.ohrwurm.tracks?.items
+                        ? this.props.ohrwurm.tracks.items
+                        : []
+                    }
+                    onTranscriptClick={this.selectTrack}
+                    onDeleteClick={this.deleteTrack}
+                    onEditClick={this.editTrack}
+                  ></TrackTable>
+                </div>
+              )}
+            </Dropzone>
             <TrackTable
               entries={
                 this.props.ohrwurm.tracks?.items
@@ -259,6 +314,7 @@ class Ohrwurm extends React.Component<Props, State> {
         )}
         {this.state.trackModal && (
           <TrackModal
+            files={this.state.files}
             toggle={this.toggleTrackModal}
             track={this.state.selectedTrack}
           />
