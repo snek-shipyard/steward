@@ -27,11 +27,13 @@ import Services from "../../../serviceRegistry.json";
 //> Components
 import { Breadcrumbs } from "../../atoms";
 import { LoginForm, ServiceGroup, MemberTable } from "../../molecules";
+import { MemberModal } from "../../organisms/modals";
 //#endregion
 
 //#region > Interfaces
 interface State {
   searchQuery: string;
+  memberModal: boolean;
 }
 interface OwnProps {}
 interface StateProps {
@@ -45,6 +47,7 @@ interface Props extends OwnProps, StateProps, RouteComponentProps {}
 class MemberPage extends React.Component<Props, State> {
   state: State = {
     searchQuery: "",
+    memberModal: false,
   };
 
   deleteUser = () => {
@@ -61,43 +64,54 @@ class MemberPage extends React.Component<Props, State> {
     // Add search for users
   };
 
+  toggleMemberModal = () => {
+    this.setState({
+      memberModal: !this.state.memberModal,
+    });
+  };
+
   render() {
     return (
-      <MDBContainer>
-        <Breadcrumbs
-          crumbs={[
-            {
-              name: "Ohrwurm",
-              // onClick: () => this.switchForm("SERVICE"),
-            },
-            {
-              name: "Members management",
-              active: true,
-            },
-          ]}
-        ></Breadcrumbs>
-        <MDBRow>
-          <MDBCol size="11">
-            <MDBInput
-              hint="Search"
-              type="text"
-              value={this.state.searchQuery}
-              containerClass="active-pink active-pink-2 mt-0 mb-3"
-              onChange={(e: any) => this.search(e.target.value)}
-            />
-          </MDBCol>
-          <MDBCol size="1">
-            <MDBBtn flat onClick={() => alert()}>
-              <MDBIcon icon="plus" size="lg" className="blue-text" />
-            </MDBBtn>
-          </MDBCol>
-        </MDBRow>
-        <MemberTable
-          members={[]}
-          onDeleteClick={() => this.deleteUser()}
-          onEditClick={() => this.editUser()}
-        ></MemberTable>
-      </MDBContainer>
+      <>
+        <MDBContainer>
+          <Breadcrumbs
+            crumbs={[
+              {
+                name: "Ohrwurm",
+                // onClick: () => this.switchForm("SERVICE"),
+              },
+              {
+                name: "Members management",
+                active: true,
+              },
+            ]}
+          ></Breadcrumbs>
+          <MDBRow>
+            <MDBCol size="11">
+              <MDBInput
+                hint="Search"
+                type="text"
+                value={this.state.searchQuery}
+                containerClass="active-pink active-pink-2 mt-0 mb-3"
+                onChange={(e: any) => this.search(e.target.value)}
+              />
+            </MDBCol>
+            <MDBCol size="1">
+              <MDBBtn flat onClick={() => this.toggleMemberModal()}>
+                <MDBIcon icon="plus" size="lg" className="blue-text" />
+              </MDBBtn>
+            </MDBCol>
+          </MDBRow>
+          <MemberTable
+            members={[]}
+            onDeleteClick={() => this.deleteUser()}
+            onEditClick={() => this.editUser()}
+          ></MemberTable>
+        </MDBContainer>
+        {this.state.memberModal && (
+          <MemberModal toggle={this.toggleMemberModal} />
+        )}
+      </>
     );
   }
 }
