@@ -16,14 +16,15 @@ import {
 import { connect } from "react-redux";
 
 //> Components
-import { BasePage } from "./components/pages";
+import { OhrwurmPage, OhrwurmMemberPage } from "./components/pages";
 import LoginPage from "./components/pages/LoginPage/index";
 import PasswordChangePage from "./components/pages/PasswordChangePage/index";
-import MemberPage from "./components/pages/MemberPage";
+import MemberPage from "./components/pages/ohrwurm/MemberPage";
 
 import { RootState } from "./store/reducers/index";
 import { ThunkDispatch } from "redux-thunk";
 import { UserState } from "./store/types";
+import { Ohrwurm } from "./components/organisms";
 //#endregion
 
 interface OwnProps {}
@@ -52,14 +53,15 @@ class Routes extends React.Component<Props, {}> {
 
     return (
       <Switch>
-        <Route exact path="/" component={() => <BasePage />} />
+        <Route exact path="/" component={() => <OhrwurmPage />} />
+        <Route exact path="/member" component={() => <OhrwurmMemberPage />} />
+
         <Route exact path="/login" component={() => <LoginPage />} />
         <Route
           exact
           path="/change-password"
           component={() => <PasswordChangePage />}
         />
-        <Route exact path="/member" component={() => <MemberPage />} />
       </Switch>
     );
   }

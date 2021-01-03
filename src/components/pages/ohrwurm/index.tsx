@@ -30,7 +30,7 @@ interface Props
 
 //#region > Components
 /** @class This component displays the landing page including login and register */
-class BasePage extends React.Component<Props, State> {
+class OhrwurmPage extends React.Component<Props, State> {
   render() {
     if (this.props.user.passwordChanged === false) {
       this.props.history.push("/change-password");
@@ -69,7 +69,7 @@ const mapDispatchToProps = {};
  * <Route>'s match.
  */
 export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(BasePage)
+  connect(mapStateToProps, mapDispatchToProps)(OhrwurmPage)
 );
 //#endregion
 
