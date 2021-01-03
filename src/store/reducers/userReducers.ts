@@ -6,6 +6,7 @@ import { UserState, LoginAction } from "../types";
 //#region > Constant Variables
 const INIT_STATE: UserState = {
   anonymous: undefined,
+  passwordChanged: undefined,
   username: undefined,
   error: undefined,
   errorDetails: undefined,
@@ -23,6 +24,7 @@ const userReducer = (state = INIT_STATE, action: LoginAction): UserState => {
     case "USER_LOGIN_SUCCESS":
       return {
         username: payload?.username,
+        passwordChanged: payload?.passwordChanged,
         anonymous: payload?.anonymous,
       };
     case "USER_LOGIN_FAILURE":
@@ -35,11 +37,27 @@ const userReducer = (state = INIT_STATE, action: LoginAction): UserState => {
     case "USER_LOGOUT_SUCCESS":
       return {
         anonymous: true,
+        passwordChanged: undefined,
         username: undefined,
       };
     case "USER_LOGOUT_FAILURE":
       return {
         ...INIT_STATE,
+        error: payload?.error,
+        errorDetails: payload?.errorDetails,
+      };
+    //> Change password
+    case "USER_CHANGE_PASSWORD_REQUEST":
+      return state;
+    case "USER_CHANGE_PASSWORD_SUCCESS":
+      return {
+        ...state,
+        passwordChanged: true,
+      };
+    case "USER_CHANGE_PASSWORD_FAILURE":
+      console.log("ERROR", payload);
+      return {
+        ...state,
         error: payload?.error,
         errorDetails: payload?.errorDetails,
       };
