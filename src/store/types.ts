@@ -83,6 +83,7 @@ export interface Track {
   transcript: string;
   pac: PAC;
   audioFileUrl: string;
+  actions: string;
 }
 
 export interface OhrwurmState extends ErrorState {

@@ -4,7 +4,15 @@
 import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
-import { MDBDataTableV5, MDBIcon, MDBBadge, MDBChip, MDBBtn } from "mdbreact";
+import {
+  MDBDataTableV5,
+  MDBIcon,
+  MDBBadge,
+  MDBChip,
+  MDBBtn,
+  MDBRow,
+  MDBCol,
+} from "mdbreact";
 //> Audio Player
 import ReactPlayer from "react-player";
 //> Moment
@@ -19,6 +27,8 @@ class TrackTable extends React.Component<
   {
     entries: Track[];
     onTranscriptClick: (track: Track) => void;
+    onDeleteClick: (track: Track) => void;
+    onEditClick: (track: Track) => void;
   },
   {}
 > {
@@ -71,11 +81,29 @@ class TrackTable extends React.Component<
         audio: (
           <ReactPlayer
             url={audioFileUrl}
-            width="300px"
+            width="100px"
             height="50px"
             playing={false}
             controls={true}
           />
+        ),
+        actions: (
+          <MDBRow>
+            <MDBCol size="2">
+              <MDBIcon
+                icon="pencil-alt"
+                size="lg"
+                onClick={() => this.props.onEditClick(e)}
+              />
+            </MDBCol>
+            <MDBCol size="2">
+              <MDBIcon
+                icon="trash-alt"
+                size="lg"
+                onClick={() => this.props.onDeleteClick(e)}
+              />
+            </MDBCol>
+          </MDBRow>
         ),
       };
     });
@@ -119,6 +147,12 @@ class TrackTable extends React.Component<
         width: 300,
         sort: "disabled",
       },
+      {
+        label: "Actions",
+        field: "actions",
+        width: 300,
+        sort: "disabled",
+      },
     ],
     rows: this.generateRows(),
   };
@@ -131,7 +165,6 @@ class TrackTable extends React.Component<
   }
 
   render() {
-    console.log(this.state);
     return (
       <MDBDataTableV5
         hover
