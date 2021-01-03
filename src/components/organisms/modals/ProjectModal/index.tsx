@@ -83,7 +83,12 @@ class ProjectModal extends React.Component<Props, State> {
 
   render() {
     return (
-      <MDBModal isOpen={true} toggle={this.props.toggle} size="lg">
+      <MDBModal
+        isOpen={true}
+        toggle={this.props.toggle}
+        size="lg"
+        id="projectmodal"
+      >
         <MDBModalBody>
           <MDBRow>
             <MDBCol>
@@ -112,6 +117,7 @@ class ProjectModal extends React.Component<Props, State> {
                 }
               />
 
+              <label>Member</label>
               <div className="rounded mb-0 border border-light">
                 <div className="mb-0">
                   <MDBInput
