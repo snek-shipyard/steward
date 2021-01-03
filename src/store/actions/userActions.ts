@@ -7,6 +7,9 @@ import { sha256 } from "js-sha256";
 import { serializeError } from "serialize-error";
 //> Redux
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
+//> GQL
+// DocumentNode needed for queries
+import gql from "graphql-tag";
 
 //> Action Types
 import { RootState } from "../reducers/index";
@@ -40,10 +43,36 @@ const loginAction = (user?: {
       const whoami = (await getClientSnek().session.begin(user)) as any;
 
       if (!whoami?.anonymous && whoami?.__typename === "SNEKUser") {
+        // Extra whoami request because .session.begin() does not support
+        // passwordChanged return value
+        const passwordChanged = await getClientSnek()
+          .session.runner<{
+            me: {
+              passwordChanged: boolean;
+            };
+          }>(
+            "query",
+            gql`
+              query whoami($token: String!) {
+                me(token: $token) {
+                  passwordChanged
+                }
+              }
+            `,
+            {}
+          )
+          .then(({ data, errors }) => {
+            if (!data || errors) {
+              throw Error("Login failed");
+            }
+            return data.me.passwordChanged;
+          });
+
         dispatch({
           type: "USER_LOGIN_SUCCESS",
           payload: {
             username: whoami.username,
+            passwordChanged: passwordChanged,
             anonymous: false,
           },
         });
@@ -106,10 +135,63 @@ const logoutAction = (): ThunkAction<
     }
   };
 };
+
+/**
+ * Change user password
+ *
+ * @param newPassword
+ */
+const changePasswordAction = (
+  newPassword: string
+): ThunkAction<void, RootState, loginArguments, LoginAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, loginArguments, LoginAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      dispatch({ type: "USER_CHANGE_PASSWORD_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        me: {
+          passwordChanged: boolean;
+        };
+      }>(
+        "mutation",
+        gql`
+          mutation changePassword($token: String!, $newPassword: String!) {
+            changePassword(token: $token, newPassword: $newPassword) {
+              success
+            }
+          }
+        `,
+        { newPassword: sha256(newPassword) }
+      );
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      dispatch({ type: "USER_CHANGE_PASSWORD_SUCCESS" });
+    } catch (ex) {
+      let result = dispatch({
+        type: "USER_CHANGE_PASSWORD_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Password change failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+      return result;
+    }
+  };
+};
 //#endregion
 
 //#region > Exports
-export { loginAction, logoutAction };
+export { loginAction, logoutAction, changePasswordAction };
 //#endregion
 
 /**

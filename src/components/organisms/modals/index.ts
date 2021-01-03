@@ -1,11 +1,13 @@
 //#region > Imports
 //> Modals
+import ProjectModal from "./ProjectModal";
+import MemberModal from "./MemberModal";
 import TrackModal from "./TrackModal";
 //#endregion
 
 //#region > Exports
 //> Modals
-export { TrackModal };
+export { ProjectModal, MemberModal, TrackModal };
 //#LoginForm
 
 /**

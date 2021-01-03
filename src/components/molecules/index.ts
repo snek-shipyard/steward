@@ -2,14 +2,23 @@
 //> Molecules
 // Import all components to export them for easy access from parent components
 import LoginForm from "./Login/index";
+import PasswordChangeForm from "./PasswordChange/index";
 import ServiceGroup from "./ServiceGroup/index";
 import ProjectTable from "./tables/ProjectTable/index";
 import TrackTable from "./tables/TrackTable/index";
+import MemberTable from "./tables/MemberTable/index";
 //#endregion
 
 //#region > Exports
 //> Molecules
-export { LoginForm, ServiceGroup, ProjectTable, TrackTable };
+export {
+  LoginForm,
+  PasswordChangeForm,
+  ServiceGroup,
+  ProjectTable,
+  TrackTable,
+  MemberTable,
+};
 //#LoginForm
 
 /**

@@ -11,42 +11,39 @@ import { PAC } from "../../../../store/types";
 //#endregion
 
 //#region > Components
-class ProjectTable extends React.Component<
+class MemberTable extends React.Component<
   {
-    entries: PAC[];
-    onClick: (index: number) => void;
+    members: [];
     onDeleteClick: (index: number) => void;
     onEditClick: (index: number) => void;
   },
   {}
 > {
   generateRows = () => {
-    return this.props.entries.map((e) => {
-      const { id, title, description } = e;
+    return this.props.members.map((e) => {
+      const { id, title } = e;
 
       return {
         id,
         name: title,
-        description,
         actions: (
           <MDBRow>
             <MDBCol size="2">
               <MDBIcon
                 icon="pencil-alt"
                 size="lg"
-                onClick={() => this.props.onEditClick(e.id)}
+                onClick={() => this.props.onEditClick(e)}
               />
             </MDBCol>
             <MDBCol size="2">
               <MDBIcon
                 icon="trash-alt"
                 size="lg"
-                onClick={() => this.props.onDeleteClick(e.id)}
+                onClick={() => this.props.onDeleteClick(e)}
               />
             </MDBCol>
           </MDBRow>
         ),
-        clickEvent: () => this.props.onClick(e.id),
       };
     });
   };
@@ -61,10 +58,6 @@ class ProjectTable extends React.Component<
           "aria-controls": "DataTable",
           "aria-label": "Name",
         },
-      },
-      {
-        label: "Description",
-        field: "description",
       },
       {
         label: "Actions",
@@ -97,5 +90,5 @@ class ProjectTable extends React.Component<
 //#endregion
 
 //#region > Exports
-export default ProjectTable;
+export default MemberTable;
 //#endregion

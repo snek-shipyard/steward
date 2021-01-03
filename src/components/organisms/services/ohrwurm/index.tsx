@@ -34,7 +34,7 @@ import {
 //> Components
 import { Breadcrumbs } from "../../../atoms";
 import { ProjectTable, TrackTable } from "../../../molecules";
-import { TrackModal } from "../../modals";
+import { ProjectModal, TrackModal } from "../../modals";
 //> Style Sheet
 import "./ohrwurm.scss";
 //#endregion
@@ -51,6 +51,8 @@ interface State {
   transcriptText: string;
   searchQuery?: string;
   selectedProjectIndex?: number;
+  editingProject: boolean;
+  projectModal: boolean;
   trackModal: boolean;
   selectedTrack: Track | undefined;
   error: Array<any>;
@@ -84,6 +86,8 @@ class Ohrwurm extends React.Component<Props, State> {
     showTranscriptModal: false,
     transcriptTitle: "",
     transcriptText: "",
+    editingProject: false,
+    projectModal: false,
     trackModal: false,
     selectedTrack: undefined,
     error: [],
@@ -101,9 +105,24 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   selectProject = (index: number) => {
-    this.props.fetchPACTracks(index);
-    this.setState({ selectedProjectIndex: index, searchQuery: "" });
-    this.switchTable("TRACK");
+    console.log(this.state.editingProject, "XXXXXXXXXXXXXXXXXXX");
+    if (!this.state.editingProject) {
+      this.props.fetchPACTracks(index);
+      this.setState({ selectedProjectIndex: index, searchQuery: "" });
+      this.switchTable("TRACK");
+    } else {
+      this.setState({ editingProject: false });
+    }
+  };
+
+  deleteProject = (index: number) => {
+    this.setState({ selectedProjectIndex: index });
+    this.state.editingProject = true;
+  };
+
+  editProject = (index: number) => {
+    this.setState({ selectedProjectIndex: index });
+    this.state.editingProject = true;
   };
 
   selectTrack = (track: Track) => {
@@ -131,6 +150,11 @@ class Ohrwurm extends React.Component<Props, State> {
       this.props.fetchPACS(value);
     }
   };
+
+  toggleProjectModal = () => {
+    this.setState({
+      projectModal: !this.state.projectModal,
+    });
 
   toggleTrackModal = () => {
     this.setState({
@@ -210,7 +234,7 @@ class Ohrwurm extends React.Component<Props, State> {
           </MDBCol>
           <MDBCol size="1">
             {this.state.activeTable === "PROJECT" ? (
-              <MDBBtn flat onClick={() => alert()}>
+              <MDBBtn flat onClick={() => this.toggleProjectModal()}>
                 <MDBIcon icon="plus" size="lg" className="blue-text" />
               </MDBBtn>
             ) : (
@@ -254,6 +278,8 @@ class Ohrwurm extends React.Component<Props, State> {
                 : []
             }
             onClick={this.selectProject}
+            onDeleteClick={this.deleteProject}
+            onEditClick={this.editProject}
           ></ProjectTable>
         ) : (
           <>
@@ -292,6 +318,8 @@ class Ohrwurm extends React.Component<Props, State> {
             </Dropzone>
           </>
         )}
+        {this.state.projectModal && (
+          <ProjectModal toggle={this.toggleProjectModal} />}
         {this.state.trackModal && (
           <TrackModal
             files={this.state.files}

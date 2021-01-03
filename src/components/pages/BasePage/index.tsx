@@ -32,6 +32,10 @@ interface Props
 /** @class This component displays the landing page including login and register */
 class BasePage extends React.Component<Props, State> {
   render() {
+    if (this.props.user.passwordChanged === false) {
+      this.props.history.push("/change-password");
+    }
+
     return (
       <>
         {this.props.user.anonymous === false && (

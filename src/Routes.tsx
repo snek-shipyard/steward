@@ -18,6 +18,8 @@ import { connect } from "react-redux";
 //> Components
 import { BasePage } from "./components/pages";
 import LoginPage from "./components/pages/LoginPage/index";
+import PasswordChangePage from "./components/pages/PasswordChangePage/index";
+import MemberPage from "./components/pages/MemberPage";
 
 import { RootState } from "./store/reducers/index";
 import { ThunkDispatch } from "redux-thunk";
@@ -39,10 +41,8 @@ interface Props
 /** @class Route component which includes all routes to specified components */
 class Routes extends React.Component<Props, {}> {
   render() {
-    const anonymous = this.props.user.anonymous;
+    const { anonymous, passwordChanged } = this.props.user;
     const location = this.props.location;
-
-    console.log(anonymous, location);
 
     if (anonymous && location.pathname === "/")
       this.props.history.push("/login");
@@ -54,6 +54,12 @@ class Routes extends React.Component<Props, {}> {
       <Switch>
         <Route exact path="/" component={() => <BasePage />} />
         <Route exact path="/login" component={() => <LoginPage />} />
+        <Route
+          exact
+          path="/change-password"
+          component={() => <PasswordChangePage />}
+        />
+        <Route exact path="/member" component={() => <MemberPage />} />
       </Switch>
     );
   }
