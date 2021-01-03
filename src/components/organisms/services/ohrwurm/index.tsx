@@ -32,6 +32,7 @@ import {
 //> Components
 import { Breadcrumbs } from "../../../atoms";
 import { ProjectTable, TrackTable } from "../../../molecules";
+import { ProjectModal } from "../../modals";
 //> Style Sheet
 import "./ohrwurm.scss";
 //#endregion
@@ -49,6 +50,7 @@ interface State {
   searchQuery?: string;
   selectedProjectIndex?: number;
   editingProject: boolean;
+  projectModal: boolean;
 }
 interface OwnProps {}
 interface StateProps {
@@ -79,6 +81,7 @@ class Ohrwurm extends React.Component<Props, State> {
     transcriptTitle: "",
     transcriptText: "",
     editingProject: false,
+    projectModal: false,
   };
 
   componentDidMount = () => {
@@ -103,13 +106,11 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   deleteProject = (index: number) => {
-    this.props.fetchPACTracks(index);
     this.setState({ selectedProjectIndex: index });
     this.state.editingProject = true;
   };
 
   editProject = (index: number) => {
-    this.props.fetchPACTracks(index);
     this.setState({ selectedProjectIndex: index });
     this.state.editingProject = true;
   };
@@ -140,6 +141,12 @@ class Ohrwurm extends React.Component<Props, State> {
     if (this.state.activeTable === "PROJECT") {
       this.props.fetchPACS(value);
     }
+  };
+
+  toggleProjectModal = () => {
+    this.setState({
+      projectModal: !this.state.projectModal,
+    });
   };
 
   render() {
@@ -187,7 +194,7 @@ class Ohrwurm extends React.Component<Props, State> {
                   icon="plus"
                   size="lg"
                   className="blue-text"
-                  onClick={() => alert()}
+                  onClick={() => this.toggleProjectModal()}
                 />
               </MDBBtn>
             ) : (
@@ -250,6 +257,9 @@ class Ohrwurm extends React.Component<Props, State> {
               onTranscriptClick={this.selectTrack}
             ></TrackTable>
           </>
+        )}
+        {this.state.projectModal && (
+          <ProjectModal toggle={this.toggleProjectModal} />
         )}
       </>
     );

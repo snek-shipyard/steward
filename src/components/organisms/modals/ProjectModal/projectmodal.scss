@@ -1,0 +1,10 @@
+.list-group {
+  max-height: 10rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.list-group-item {
+  padding: unset;
+}
