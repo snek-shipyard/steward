@@ -111,42 +111,51 @@ class ProjectModal extends React.Component<Props, State> {
                   this.setDescription(e)
                 }
               />
-              <MDBInput
-                hint="Search"
-                type="text"
-                value={this.state.searchQuery}
-                containerClass="active-pink active-pink-2 mt-0 mb-3"
-                onChange={(e: any) => this.search(e.target.value)}
-              />
-              <MDBListGroup>
-                <MDBListGroupItem>
+
+              <div className="rounded mb-0 border border-light">
+                <div className="mb-0">
                   <MDBInput
-                    type="checkbox"
-                    id="checkbox1"
-                    label="David Pinterics"
+                    hint="Search"
+                    type="text"
+                    value={this.state.searchQuery}
+                    containerClass="active-pink active-pink-2 mt-0 mb-3"
+                    onChange={(e: any) => this.search(e.target.value)}
                   />
-                </MDBListGroupItem>
-                <MDBListGroupItem>
-                  <MDBInput
-                    type="checkbox"
-                    id="checkbox3"
-                    label="David Pinterics"
-                  />
-                </MDBListGroupItem>
-                <MDBListGroupItem>
-                  <MDBInput
-                    type="checkbox"
-                    id="checkbox2"
-                    label="David Pinterics"
-                  />
-                </MDBListGroupItem>
-                <MDBListGroupItem>
-                  <MDBInput type="checkbox" id="checkbox4" label="Hugo" />
-                </MDBListGroupItem>
-                <MDBListGroupItem>
-                  <MDBInput type="checkbox" id="checkbox5" label="TESTTSTST" />
-                </MDBListGroupItem>
-              </MDBListGroup>
+                </div>
+                <MDBListGroup>
+                  <MDBListGroupItem>
+                    <MDBInput
+                      type="checkbox"
+                      id="checkbox1"
+                      label="David Pinterics"
+                    />
+                  </MDBListGroupItem>
+                  <MDBListGroupItem>
+                    <MDBInput
+                      type="checkbox"
+                      id="checkbox3"
+                      label="David Pinterics"
+                    />
+                  </MDBListGroupItem>
+                  <MDBListGroupItem>
+                    <MDBInput
+                      type="checkbox"
+                      id="checkbox2"
+                      label="David Pinterics"
+                    />
+                  </MDBListGroupItem>
+                  <MDBListGroupItem>
+                    <MDBInput type="checkbox" id="checkbox4" label="Hugo" />
+                  </MDBListGroupItem>
+                  <MDBListGroupItem>
+                    <MDBInput
+                      type="checkbox"
+                      id="checkbox5"
+                      label="TESTTSTST"
+                    />
+                  </MDBListGroupItem>
+                </MDBListGroup>
+              </div>
               <div className="text-right mb-4 mt-5">
                 <MDBBtn
                   rounded
