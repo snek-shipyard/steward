@@ -19,6 +19,7 @@ import { connect } from "react-redux";
 import { BasePage } from "./components/pages";
 import LoginPage from "./components/pages/LoginPage/index";
 import PasswordChangePage from "./components/pages/PasswordChangePage/index";
+import MemberPage from "./components/pages/MemberPage";
 
 import { RootState } from "./store/reducers/index";
 import { ThunkDispatch } from "redux-thunk";
@@ -58,6 +59,7 @@ class Routes extends React.Component<Props, {}> {
           path="/change-password"
           component={() => <PasswordChangePage />}
         />
+        <Route exact path="/member" component={() => <MemberPage />} />
       </Switch>
     );
   }

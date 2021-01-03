@@ -6,6 +6,7 @@ import PasswordChangeForm from "./PasswordChange/index";
 import ServiceGroup from "./ServiceGroup/index";
 import ProjectTable from "./tables/ProjectTable/index";
 import TrackTable from "./tables/TrackTable/index";
+import MemberTable from "./tables/MemberTable/index";
 //#endregion
 
 //#region > Exports
@@ -16,6 +17,7 @@ export {
   ServiceGroup,
   ProjectTable,
   TrackTable,
+  MemberTable,
 };
 //#LoginForm
 
