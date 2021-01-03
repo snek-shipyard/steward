@@ -79,6 +79,9 @@ class Navbar extends React.Component<Props, State> {
                   <MDBIcon icon="user" />
                 </MDBDropdownToggle>
                 <MDBDropdownMenu right>
+                  <MDBDropdownItem href="change-password">
+                    Change password
+                  </MDBDropdownItem>
                   <MDBDropdownItem href="#" onClick={() => this.logout()}>
                     Logout
                   </MDBDropdownItem>

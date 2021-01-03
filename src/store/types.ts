@@ -27,9 +27,13 @@ export const USER_LOGIN_SUCCESS = "USER_LOGIN_SUCCESS";
 export const USER_LOGOUT_REQUEST = "USER_LOGOUT_REQUEST";
 export const USER_LOGOUT_FAILURE = "USER_LOGOUT_FAILURE";
 export const USER_LOGOUT_SUCCESS = "USER_LOGOUT_SUCCESS";
+export const USER_CHANGE_PASSWORD_REQUEST = "USER_CHANGE_PASSWORD_REQUEST";
+export const USER_CHANGE_PASSWORD_FAILURE = "USER_CHANGE_PASSWORD_FAILURE";
+export const USER_CHANGE_PASSWORD_SUCCESS = "USER_CHANGE_PASSWORD_SUCCESS";
 
 export interface UserState extends ErrorState {
   anonymous?: boolean;
+  passwordChanged?: boolean;
   username?: string;
 }
 
@@ -40,7 +44,10 @@ export type LoginAction = {
     | typeof USER_LOGIN_SUCCESS
     | typeof USER_LOGOUT_REQUEST
     | typeof USER_LOGOUT_FAILURE
-    | typeof USER_LOGOUT_SUCCESS;
+    | typeof USER_LOGOUT_SUCCESS
+    | typeof USER_CHANGE_PASSWORD_REQUEST
+    | typeof USER_CHANGE_PASSWORD_FAILURE
+    | typeof USER_CHANGE_PASSWORD_SUCCESS;
   payload?: UserState;
 };
 //#endregion
