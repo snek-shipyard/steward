@@ -290,16 +290,6 @@ class Ohrwurm extends React.Component<Props, State> {
                 </div>
               )}
             </Dropzone>
-            <TrackTable
-              entries={
-                this.props.ohrwurm.tracks?.items
-                  ? this.props.ohrwurm.tracks.items
-                  : []
-              }
-              onTranscriptClick={this.selectTrack}
-              onDeleteClick={this.deleteTrack}
-              onEditClick={this.editTrack}
-            ></TrackTable>
           </>
         )}
         {this.state.trackModal && (
