@@ -14,9 +14,14 @@ import {
   MDBModalBody,
   MDBModalFooter,
   MDBModalHeader,
+  MDBRow,
+  MDBCol,
+  MDBBtn,
 } from "mdbreact";
 //> Redux
 import { connect } from "react-redux";
+// Contains the functionality for uploading a file
+import Dropzone from "react-dropzone";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
@@ -29,6 +34,7 @@ import {
 //> Components
 import { Breadcrumbs } from "../../../atoms";
 import { ProjectTable, TrackTable } from "../../../molecules";
+import { TrackModal } from "../../modals";
 //> Style Sheet
 import "./ohrwurm.scss";
 //#endregion
@@ -45,6 +51,10 @@ interface State {
   transcriptText: string;
   searchQuery?: string;
   selectedProjectIndex?: number;
+  trackModal: boolean;
+  selectedTrack: Track | undefined;
+  error: Array<any>;
+  files: any;
 }
 interface OwnProps {}
 interface StateProps {
@@ -74,6 +84,10 @@ class Ohrwurm extends React.Component<Props, State> {
     showTranscriptModal: false,
     transcriptTitle: "",
     transcriptText: "",
+    trackModal: false,
+    selectedTrack: undefined,
+    error: [],
+    files: null,
   };
 
   componentDidMount = () => {
@@ -108,8 +122,6 @@ class Ohrwurm extends React.Component<Props, State> {
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
-    console.log(this.state.searchQuery);
-    console.log(this.state.activeTable);
 
     if (this.state.activeTable === "TRACK" && this.state.selectedProjectIndex) {
       this.props.fetchPACTracks(this.state.selectedProjectIndex, value);
@@ -120,7 +132,45 @@ class Ohrwurm extends React.Component<Props, State> {
     }
   };
 
+  toggleTrackModal = () => {
+    this.setState({
+      trackModal: !this.state.trackModal,
+    });
+    if (this.state.trackModal) {
+      this.setState({ selectedTrack: undefined });
+    }
+  };
+
+  deleteTrack = (track: Track) => {
+    console.log(track);
+  };
+
+  editTrack = (track: Track) => {
+    this.setState({
+      selectedTrack: track,
+    });
+    this.toggleTrackModal();
+  };
+
+  onDrop = async (files: any) => {
+    if (files.length > 0) {
+      this.setState({
+        files,
+        error: [],
+      });
+
+      this.toggleTrackModal();
+    } else {
+      this.setState({
+        error: ["Only sound related file uploading is supported!"],
+      });
+    }
+  };
+
   render() {
+    const activeStyle = {
+      borderColor: "#2196f3",
+    };
     return (
       <>
         {this.state.activeTable === "PROJECT" ? (
@@ -148,13 +198,28 @@ class Ohrwurm extends React.Component<Props, State> {
             ]}
           ></Breadcrumbs>
         )}
-        <MDBInput
-          hint="Search"
-          type="text"
-          value={this.state.searchQuery}
-          containerClass="active-pink active-pink-2 mt-0 mb-3"
-          onChange={(e: any) => this.search(e.target.value)}
-        />
+        <MDBRow>
+          <MDBCol size="11">
+            <MDBInput
+              hint="Search"
+              type="text"
+              value={this.state.searchQuery}
+              containerClass="active-pink active-pink-2 mt-0 mb-3"
+              onChange={(e: any) => this.search(e.target.value)}
+            />
+          </MDBCol>
+          <MDBCol size="1">
+            {this.state.activeTable === "PROJECT" ? (
+              <MDBBtn flat onClick={() => alert()}>
+                <MDBIcon icon="plus" size="lg" className="blue-text" />
+              </MDBBtn>
+            ) : (
+              <MDBBtn flat onClick={() => this.toggleTrackModal()}>
+                <MDBIcon icon="upload" size="lg" className="blue-text" />
+              </MDBBtn>
+            )}
+          </MDBCol>
+        </MDBRow>
 
         <MDBContainer>
           <MDBModal
@@ -192,15 +257,47 @@ class Ohrwurm extends React.Component<Props, State> {
           ></ProjectTable>
         ) : (
           <>
-            <TrackTable
-              entries={
-                this.props.ohrwurm.tracks?.items
-                  ? this.props.ohrwurm.tracks.items
-                  : []
-              }
-              onTranscriptClick={this.selectTrack}
-            ></TrackTable>
+            <ul className="list-group mt-2">
+              {this.state.error.length > 0 &&
+                this.state.error.map((error, i) => (
+                  <li
+                    className="list-group-item list-group-item-danger"
+                    key={i}
+                  >
+                    <h3>{error}</h3>
+                  </li>
+                ))}
+            </ul>
+            <Dropzone
+              onDrop={this.onDrop}
+              accept="audio/*"
+              noClick
+              multiple={false}
+            >
+              {({ getRootProps, getInputProps, acceptedFiles }) => (
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <TrackTable
+                    entries={
+                      this.props.ohrwurm.tracks?.items
+                        ? this.props.ohrwurm.tracks.items
+                        : []
+                    }
+                    onTranscriptClick={this.selectTrack}
+                    onDeleteClick={this.deleteTrack}
+                    onEditClick={this.editTrack}
+                  ></TrackTable>
+                </div>
+              )}
+            </Dropzone>
           </>
+        )}
+        {this.state.trackModal && (
+          <TrackModal
+            files={this.state.files}
+            toggle={this.toggleTrackModal}
+            track={this.state.selectedTrack}
+          />
         )}
       </>
     );
