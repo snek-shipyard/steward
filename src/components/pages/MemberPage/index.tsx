@@ -87,13 +87,8 @@ class MemberPage extends React.Component<Props, State> {
             />
           </MDBCol>
           <MDBCol size="1">
-            <MDBBtn flat>
-              <MDBIcon
-                icon="plus"
-                size="lg"
-                className="blue-text"
-                onClick={() => alert()}
-              />
+            <MDBBtn flat onClick={() => alert()}>
+              <MDBIcon icon="plus" size="lg" className="blue-text" />
             </MDBBtn>
           </MDBCol>
         </MDBRow>
