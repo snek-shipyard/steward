@@ -14,6 +14,9 @@ import {
   MDBModalBody,
   MDBModalFooter,
   MDBModalHeader,
+  MDBRow,
+  MDBCol,
+  MDBBtn,
 } from "mdbreact";
 //> Redux
 import { connect } from "react-redux";
@@ -45,6 +48,7 @@ interface State {
   transcriptText: string;
   searchQuery?: string;
   selectedProjectIndex?: number;
+  editingProject: boolean;
 }
 interface OwnProps {}
 interface StateProps {
@@ -74,6 +78,7 @@ class Ohrwurm extends React.Component<Props, State> {
     showTranscriptModal: false,
     transcriptTitle: "",
     transcriptText: "",
+    editingProject: false,
   };
 
   componentDidMount = () => {
@@ -87,9 +92,26 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   selectProject = (index: number) => {
+    console.log(this.state.editingProject, "XXXXXXXXXXXXXXXXXXX");
+    if (!this.state.editingProject) {
+      this.props.fetchPACTracks(index);
+      this.setState({ selectedProjectIndex: index, searchQuery: "" });
+      this.switchTable("TRACK");
+    } else {
+      this.setState({ editingProject: false });
+    }
+  };
+
+  deleteProject = (index: number) => {
     this.props.fetchPACTracks(index);
-    this.setState({ selectedProjectIndex: index, searchQuery: "" });
-    this.switchTable("TRACK");
+    this.setState({ selectedProjectIndex: index });
+    this.state.editingProject = true;
+  };
+
+  editProject = (index: number) => {
+    this.props.fetchPACTracks(index);
+    this.setState({ selectedProjectIndex: index });
+    this.state.editingProject = true;
   };
 
   selectTrack = (track: Track) => {
@@ -148,13 +170,38 @@ class Ohrwurm extends React.Component<Props, State> {
             ]}
           ></Breadcrumbs>
         )}
-        <MDBInput
-          hint="Search"
-          type="text"
-          value={this.state.searchQuery}
-          containerClass="active-pink active-pink-2 mt-0 mb-3"
-          onChange={(e: any) => this.search(e.target.value)}
-        />
+        <MDBRow>
+          <MDBCol size="11">
+            <MDBInput
+              hint="Search"
+              type="text"
+              value={this.state.searchQuery}
+              containerClass="active-pink active-pink-2 mt-0 mb-3"
+              onChange={(e: any) => this.search(e.target.value)}
+            />
+          </MDBCol>
+          <MDBCol size="1">
+            {this.state.activeTable === "PROJECT" ? (
+              <MDBBtn flat>
+                <MDBIcon
+                  icon="plus"
+                  size="lg"
+                  className="blue-text"
+                  onClick={() => alert()}
+                />
+              </MDBBtn>
+            ) : (
+              <MDBBtn flat>
+                <MDBIcon
+                  icon="upload"
+                  size="lg"
+                  className="blue-text"
+                  onClick={() => alert()}
+                />
+              </MDBBtn>
+            )}
+          </MDBCol>
+        </MDBRow>
 
         <MDBContainer>
           <MDBModal
@@ -189,6 +236,8 @@ class Ohrwurm extends React.Component<Props, State> {
                 : []
             }
             onClick={this.selectProject}
+            onDeleteClick={this.deleteProject}
+            onEditClick={this.editProject}
           ></ProjectTable>
         ) : (
           <>

@@ -4,7 +4,7 @@
 import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
-import { MDBDataTableV5 } from "mdbreact";
+import { MDBDataTableV5, MDBRow, MDBCol, MDBIcon } from "mdbreact";
 
 //> Store Types
 import { PAC } from "../../../../store/types";
@@ -15,6 +15,8 @@ class ProjectTable extends React.Component<
   {
     entries: PAC[];
     onClick: (index: number) => void;
+    onDeleteClick: (index: number) => void;
+    onEditClick: (index: number) => void;
   },
   {}
 > {
@@ -26,6 +28,24 @@ class ProjectTable extends React.Component<
         id,
         name: title,
         description,
+        actions: (
+          <MDBRow>
+            <MDBCol size="2">
+              <MDBIcon
+                icon="pencil-alt"
+                size="lg"
+                onClick={() => this.props.onEditClick(e.id)}
+              />
+            </MDBCol>
+            <MDBCol size="2">
+              <MDBIcon
+                icon="trash-alt"
+                size="lg"
+                onClick={() => this.props.onDeleteClick(e.id)}
+              />
+            </MDBCol>
+          </MDBRow>
+        ),
         clickEvent: () => this.props.onClick(e.id),
       };
     });
@@ -45,6 +65,12 @@ class ProjectTable extends React.Component<
       {
         label: "Description",
         field: "description",
+      },
+      {
+        label: "Actions",
+        field: "actions",
+        width: 300,
+        sort: "disabled",
       },
     ],
     rows: this.generateRows(),
