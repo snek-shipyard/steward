@@ -50,6 +50,7 @@ interface State {
   searchQuery?: string;
   selectedProjectIndex?: number;
   trackModal: boolean;
+  selectedTrack: Track | undefined;
 }
 interface OwnProps {}
 interface StateProps {
@@ -80,6 +81,7 @@ class Ohrwurm extends React.Component<Props, State> {
     transcriptTitle: "",
     transcriptText: "",
     trackModal: false,
+    selectedTrack: undefined,
   };
 
   componentDidMount = () => {
@@ -130,6 +132,20 @@ class Ohrwurm extends React.Component<Props, State> {
     this.setState({
       trackModal: !this.state.trackModal,
     });
+    if (this.state.trackModal) {
+      this.setState({ selectedTrack: undefined });
+    }
+  };
+
+  deleteTrack = (track: Track) => {
+    console.log(track);
+  };
+
+  editTrack = (track: Track) => {
+    this.setState({
+      selectedTrack: track,
+    });
+    this.toggleTrackModal();
   };
 
   render() {
@@ -236,10 +252,17 @@ class Ohrwurm extends React.Component<Props, State> {
                   : []
               }
               onTranscriptClick={this.selectTrack}
+              onDeleteClick={this.deleteTrack}
+              onEditClick={this.editTrack}
             ></TrackTable>
           </>
         )}
-        {this.state.trackModal && <TrackModal toggle={this.toggleTrackModal} />}
+        {this.state.trackModal && (
+          <TrackModal
+            toggle={this.toggleTrackModal}
+            track={this.state.selectedTrack}
+          />
+        )}
       </>
     );
   }

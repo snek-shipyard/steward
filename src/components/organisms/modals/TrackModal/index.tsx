@@ -49,6 +49,7 @@ interface OwnProps {}
 interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
+  track: Track | undefined;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -77,6 +78,24 @@ class TrackModal extends React.Component<Props, State> {
     trackName: "",
     date: new Date(),
     files: null,
+  };
+
+  componentWillMount = () => {
+    if (this.props.track) {
+      const track = this.props.track;
+
+      this.setState({
+        attendees: track.attendees.map((attendee, i) => {
+          return { index: i, displayValue: attendee.name };
+        }),
+        tags: track.tags.map((tag, i) => {
+          return { index: i, displayValue: tag.name };
+        }),
+        trackName: track.title,
+        date: new Date(track.createdAt),
+        files: track.audioFileUrl,
+      });
+    }
   };
 
   setTrackName = (e: React.FormEvent<HTMLInputElement>): void => {
@@ -112,10 +131,10 @@ class TrackModal extends React.Component<Props, State> {
 
   onTagsChanged = (tags: any) => {
     this.setState({ tags });
+    console.log(this.state.tags, "###");
   };
 
   render() {
-    console.log(this.getDisplayDate(this.state.date));
     return (
       <MDBModal isOpen={true} toggle={this.props.toggle} size="lg">
         <MDBModalBody>
