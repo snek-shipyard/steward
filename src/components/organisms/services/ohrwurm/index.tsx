@@ -155,6 +155,7 @@ class Ohrwurm extends React.Component<Props, State> {
     this.setState({
       projectModal: !this.state.projectModal,
     });
+  };
 
   toggleTrackModal = () => {
     this.setState({
@@ -319,7 +320,8 @@ class Ohrwurm extends React.Component<Props, State> {
           </>
         )}
         {this.state.projectModal && (
-          <ProjectModal toggle={this.toggleProjectModal} />}
+          <ProjectModal toggle={this.toggleProjectModal} />
+        )}
         {this.state.trackModal && (
           <TrackModal
             files={this.state.files}
