@@ -20,21 +20,30 @@ const ohrwurmReducer = (
   const { type, payload } = action;
 
   switch (type) {
-    //> PAC
-    case "OHRWURM_FETCH_PACS_REQUEST":
+    //> Get PACs
+    case "OHRWURM_FETCH_PACS_REQUEST" ||
+      "OHRWURM_ADD_PAC_REQUEST" ||
+      "OHRWURM_DELETE_PAC_REQUEST" ||
+      "OHRWURM_UPDATE_PAC_REQUEST":
       return state;
-    case "OHRWURM_FETCH_PACS_SUCCESS":
+    case "OHRWURM_FETCH_PACS_SUCCESS" ||
+      "OHRWURM_ADD_PAC_SUCCESS" ||
+      "OHRWURM_DELETE_PAC_SUCCESS" ||
+      "OHRWURM_UPDATE_PAC_SUCCESS":
       return {
         ...state,
         pacs: payload?.pacs,
       };
-    case "OHRWURM_FETCH_PACS_FAILURE":
+    case "OHRWURM_FETCH_PACS_FAILURE" ||
+      "OHRWURM_ADD_PAC_FAILURE" ||
+      "OHRWURM_DELETE_PAC_FAILURE" ||
+      "OHRWURM_UPDATE_PAC_FAILURE":
       return {
         ...INIT_STATE,
         error: payload?.error,
         errorDetails: payload?.errorDetails,
       };
-    //> Track
+    //> Get Tracks
     case "OHRWURM_FETCH_TRACKS_REQUEST":
       return state;
     case "OHRWURM_FETCH_TRACKS_SUCCESS":
