@@ -645,7 +645,85 @@ const deleteMemberAction = (
     }
   };
 };
+
+const updateMemberAction = (
+  username: string,
+  isSupervisor: boolean
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation updateOhrwurmMember(
+          $token: String!
+          $username: String!
+          $isSupervisor: Boolean!
+        ) {
+          updateOhrwurmMember(
+            token: $token
+            username: $username
+            isSupervisor: $isSupervisor
+          ) {
+            member {
+              ${memberQueryFragment}
+            }
+          }
+        }
+      `;
+
+      dispatch({ type: "OHRWURM_UPDATE_MEMBER_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        updateOhrwurmMember: {
+          member: Member;
+        };
+      }>("mutation", dataSheet, { username, isSupervisor });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new pac to current pac items
+      let members = getState().ohrwurm.members;
+      if (members?.items && data) {
+        const index = members.items?.findIndex(
+          (item) => item.username === username
+        );
+
+        const items = [
+          ...members.items.slice(0, index),
+          data.updateOhrwurmMember.member,
+          ...members.items.slice(index + 1),
+        ];
+
+        members.items = [...items];
+      }
+
+      dispatch({
+        type: "OHRWURM_UPDATE_MEMBER_SUCCESS",
+        payload: {
+          members,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_UPDATE_MEMBER_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Updating Member failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
 //#endregion
+
 //#region > Exports
 export {
   fetchPACSAction,
@@ -656,6 +734,7 @@ export {
   fetchMembersAction,
   addMemberAction,
   deleteMemberAction,
+  updateMemberAction,
 };
 //#endregion
 

@@ -62,10 +62,12 @@ const ohrwurmReducer = (
     case "OHRWURM_FETCH_MEMBERS_REQUEST":
     case "OHRWURM_ADD_MEMBER_REQUEST":
     case "OHRWURM_DELETE_MEMBER_REQUEST":
+    case "OHRWURM_UPDATE_MEMBER_REQUEST":
       return state;
     case "OHRWURM_FETCH_MEMBERS_SUCCESS":
     case "OHRWURM_ADD_MEMBER_SUCCESS":
     case "OHRWURM_DELETE_MEMBER_SUCCESS":
+    case "OHRWURM_UPDATE_MEMBER_SUCCESS":
       return {
         ...state,
         members: payload?.members,
@@ -73,6 +75,7 @@ const ohrwurmReducer = (
     case "OHRWURM_FETCH_MEMBERS_FAILURE":
     case "OHRWURM_ADD_MEMBER_FAILURE":
     case "OHRWURM_DELETE_MEMBER_FAILURE":
+    case "OHRWURM_UPDATE_MEMBER_FAILURE":
       return {
         ...INIT_STATE,
         error: payload?.error,
