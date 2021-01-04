@@ -123,7 +123,7 @@ export interface OhrwurmState extends ErrorState {
     items: PAC[];
   };
   tracks?: {
-    pacId: number;
+    pacId: string;
     pagination: Pagination;
     items?: Track[];
   };

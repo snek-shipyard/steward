@@ -374,7 +374,7 @@ const updatePACAction = (
 
 //#region > Ohrwurm Track Actions
 const fetchPACTracksAction = (
-  pacId: number,
+  pacId: string,
   searchQuery?: string
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
@@ -388,7 +388,7 @@ const fetchPACTracksAction = (
 
       if (searchQuery) {
         query = gql`
-          query allPACTracks($token: String!, $searchQuery: String!, $pac: Int!) {
+          query allPACTracks($token: String!, $searchQuery: String!, $pac: ID!) {
             tracks(token: $token, searchQuery: $searchQuery, perPage: 1000, pac: $pac) {
               ${paginationQueryFragment}
               items{
@@ -401,7 +401,7 @@ const fetchPACTracksAction = (
         variables = { pac: pacId, searchQuery };
       } else {
         query = gql`
-          query allPACTracks($token: String!, $pac: Int!) {
+          query allPACTracks($token: String!, $pac: ID!) {
             tracks(token: $token, perPage: 1000, pac: $pac) {
               ${paginationQueryFragment}
               items{
