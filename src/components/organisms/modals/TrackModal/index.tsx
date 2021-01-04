@@ -26,7 +26,7 @@ import { TagInput } from "reactjs-tag-input";
 import ReactTagInput from "@snek-shipyard/react-tag-input";
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track, Significance } from "../../../../store/types";
+import { OhrwurmState, Track, TagType } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
@@ -38,7 +38,6 @@ import "./trackmodal.scss";
 //#endregion
 
 //#region > Types
-type TagType = { name: string; significance: Significance };
 type Tags = TagType[];
 //#endregion
 
@@ -46,18 +45,18 @@ type Tags = TagType[];
 interface State {
   loading: boolean;
   error: Array<any>;
-  attendees: Tags;
-  tags: Tags;
-  trackName: string;
-  date: Date;
-  files: any;
+  attendees?: Tags;
+  tags?: Tags;
+  trackName?: string;
+  date?: Date;
+  file?: any;
 }
 interface OwnProps {}
 interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
   track: Track | undefined;
-  files: any;
+  file: any;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -94,7 +93,7 @@ class TrackModal extends React.Component<Props, State> {
     tags: [],
     trackName: "",
     date: new Date(),
-    files: null,
+    file: null,
   };
 
   componentWillMount = () => {
@@ -102,19 +101,19 @@ class TrackModal extends React.Component<Props, State> {
       const track = this.props.track;
 
       this.setState({
-        attendees: track.attendees.map((attendee) => {
+        attendees: (track.attendees || []).map((attendee) => {
           return { name: attendee.name, significance: "LIGHT" };
         }),
         tags: track.tags,
         trackName: track.title,
-        date: new Date(track.createdAt),
-        files: track.audioFileUrl,
+        date: track.createdAt,
+        file: track.audioFile,
       });
     }
 
-    if (this.props.files) {
+    if (this.props.file) {
       this.setState({
-        files: this.props.files,
+        file: this.props.file,
       });
     }
   };
@@ -143,7 +142,9 @@ class TrackModal extends React.Component<Props, State> {
   };
 
   onDrop = async (files: any) => {
-    this.setState({ files });
+    let file = files[0];
+
+    this.setState({ file });
   };
 
   render() {
@@ -171,7 +172,7 @@ class TrackModal extends React.Component<Props, State> {
                 group
                 type="date"
                 validate
-                value={this.getDisplayDate(this.state.date)}
+                value={this.getDisplayDate(this.state.date || new Date())}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setDate(e)
                 }
@@ -249,7 +250,7 @@ class TrackModal extends React.Component<Props, State> {
               <label>Attendees</label>
               <span id="attendees">
                 <ReactTagInput
-                  tags={this.state.attendees}
+                  tags={this.state.attendees || []}
                   onChange={(attendees: Tags) => this.setState({ attendees })}
                   placeholder="Type and press enter"
                   editable={true}
@@ -260,7 +261,7 @@ class TrackModal extends React.Component<Props, State> {
               <label>Tags</label>
               <span id="tags">
                 <ReactTagInput
-                  tags={this.state.tags}
+                  tags={this.state.tags || []}
                   onChange={(tags: Tags) => this.setState({ tags })}
                   placeholder="Type and press enter"
                   editable={true}

@@ -63,6 +63,15 @@ export const OHRWURM_SEARCH_PACS_FAILURE = "OHRWURM_SEARCH_PACS_FAILURE";
 export const OHRWURM_FETCH_TRACKS_REQUEST = "OHRWURM_FETCH_TRACKS_REQUEST";
 export const OHRWURM_FETCH_TRACKS_SUCCESS = "OHRWURM_FETCH_TRACKS_SUCCESS";
 export const OHRWURM_FETCH_TRACKS_FAILURE = "OHRWURM_FETCH_TRACKS_FAILURE";
+export const OHRWURM_ADD_TRACK_REQUEST = "OHRWURM_ADD_TRACK_REQUEST";
+export const OHRWURM_ADD_TRACK_SUCCESS = "OHRWURM_ADD_TRACK_SUCCESS";
+export const OHRWURM_ADD_TRACK_FAILURE = "OHRWURM_ADD_TRACK_FAILURE";
+export const OHRWURM_DELETE_TRACK_REQUEST = "OHRWURM_DELETE_TRACK_REQUEST";
+export const OHRWURM_DELETE_TRACK_SUCCESS = "OHRWURM_DELETE_TRACK_SUCCESS";
+export const OHRWURM_DELETE_TRACK_FAILURE = "OHRWURM_DELETE_TRACK_FAILURE";
+export const OHRWURM_UPDATE_TRACK_REQUEST = "OHRWURM_UPDATE_TRACK_REQUEST";
+export const OHRWURM_UPDATE_TRACK_SUCCESS = "OHRWURM_UPDATE_TRACK_SUCCESS";
+export const OHRWURM_UPDATE_TRACK_FAILURE = "OHRWURM_UPDATE_TRACK_FAILURE";
 export const OHRWURM_SEARCH_TRACKS_REQUEST = "OHRWURM_SEARCH_TRACKS_REQUEST";
 export const OHRWURM_SEARCH_TRACKS_SUCCESS = "OHRWURM_SEARCH_TRACKS_SUCCESS";
 export const OHRWURM_SEARCH_TRACKS_FAILURE = "OHRWURM_SEARCH_TRACKS_FAILURE";
@@ -81,17 +90,19 @@ export type Significance =
   | "INFO"
   | "DARK";
 
+export type TagType = { name: string; significance: Significance };
+
 export interface Track {
   id: number;
-  title: string;
-  createdAt: string;
-  description: string;
-  tags: { name: string; significance: Significance }[];
-  attendees: { name: string }[];
+  title?: string;
+  createdAt?: Date;
+  description?: string;
+  tags?: TagType[];
+  attendees?: { name: string }[];
   transcript: string;
   pac: PAC;
-  audioFileUrl: string;
-  actions: string;
+  audioFile?: File;
+  audioFileUrl?: string;
 }
 
 export interface OhrwurmState extends ErrorState {
@@ -117,6 +128,15 @@ export type OhrwurmAction = {
     | typeof OHRWURM_FETCH_TRACKS_REQUEST
     | typeof OHRWURM_FETCH_TRACKS_SUCCESS
     | typeof OHRWURM_FETCH_TRACKS_FAILURE
+    | typeof OHRWURM_ADD_TRACK_REQUEST
+    | typeof OHRWURM_ADD_TRACK_SUCCESS
+    | typeof OHRWURM_ADD_TRACK_FAILURE
+    | typeof OHRWURM_DELETE_TRACK_REQUEST
+    | typeof OHRWURM_DELETE_TRACK_SUCCESS
+    | typeof OHRWURM_DELETE_TRACK_FAILURE
+    | typeof OHRWURM_UPDATE_TRACK_REQUEST
+    | typeof OHRWURM_UPDATE_TRACK_SUCCESS
+    | typeof OHRWURM_UPDATE_TRACK_FAILURE
     | typeof OHRWURM_SEARCH_TRACKS_REQUEST
     | typeof OHRWURM_SEARCH_TRACKS_SUCCESS
     | typeof OHRWURM_SEARCH_TRACKS_FAILURE;

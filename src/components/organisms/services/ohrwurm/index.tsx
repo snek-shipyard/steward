@@ -47,7 +47,7 @@ type TableType = "PROJECT" | "TRACK";
 interface State {
   activeTable: TableType;
   showTranscriptModal: boolean;
-  transcriptTitle: string;
+  transcriptTitle?: string;
   transcriptText: string;
   searchQuery?: string;
   selectedProjectIndex?: number;
@@ -56,7 +56,7 @@ interface State {
   trackModal: boolean;
   selectedTrack: Track | undefined;
   error: Array<any>;
-  files: any;
+  file: any;
 }
 interface OwnProps {}
 interface StateProps {
@@ -91,7 +91,7 @@ class Ohrwurm extends React.Component<Props, State> {
     trackModal: false,
     selectedTrack: undefined,
     error: [],
-    files: null,
+    file: null,
   };
 
   componentDidMount = () => {
@@ -180,7 +180,7 @@ class Ohrwurm extends React.Component<Props, State> {
   onDrop = async (files: any) => {
     if (files.length > 0) {
       this.setState({
-        files,
+        file: files[0],
         error: [],
       });
 
@@ -256,7 +256,7 @@ class Ohrwurm extends React.Component<Props, State> {
             <MDBModalHeader toggle={this.toggleTranscriptModal}>
               <div className="row">
                 <span className="dark-grey-text font-medium ml-3">
-                  {truncate(this.state.transcriptTitle)}
+                  {truncate(this.state.transcriptTitle || "")}
                 </span>
               </div>
               <a className="dark-grey-text font-small font-weight-bold ml-1">
@@ -324,7 +324,7 @@ class Ohrwurm extends React.Component<Props, State> {
         )}
         {this.state.trackModal && (
           <TrackModal
-            files={this.state.files}
+            file={this.state.file}
             toggle={this.toggleTrackModal}
             track={this.state.selectedTrack}
           />
