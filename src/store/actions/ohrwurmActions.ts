@@ -313,7 +313,7 @@ const addTrackAction = (
       }
 
       if (data) {
-        tracks?.items?.push({
+        const items = tracks.items?.concat({
           id: data.addTrack.track.id,
           title,
           attendees,
@@ -325,6 +325,8 @@ const addTrackAction = (
           transcript: data.addTrack.track.transcript,
           pac: data.addTrack.track.pac,
         });
+
+        tracks.items = items;
       }
 
       dispatch({
