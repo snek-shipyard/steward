@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@snek-shipyard/react-tag-input": "^1.1.0",
     "@types/react-tag-input": "^6.1.2",
     "graphql-tag": "^2.11.0",
     "js-sha256": "^0.9.0",
@@ -19,7 +20,6 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.0",
     "react-tag-input": "^6.5.2",
-    "react-tag-input-colors": "^4.3.0",
     "reactjs-tag-input": "^2.0.15",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",

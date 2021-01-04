@@ -73,12 +73,20 @@ export interface PAC {
   description: string;
 }
 
+export type Significance =
+  | "LIGHT"
+  | "SUCCESS"
+  | "DANGER"
+  | "WARNING"
+  | "INFO"
+  | "DARK";
+
 export interface Track {
   id: number;
   title: string;
   createdAt: string;
   description: string;
-  tags: { name: string; significance: string }[];
+  tags: { name: string; significance: Significance }[];
   attendees: { name: string }[];
   transcript: string;
   pac: PAC;

@@ -22,25 +22,32 @@ import { connect } from "react-redux";
 import Dropzone from "react-dropzone";
 // Contains the functionality for tag inputs
 import { TagInput } from "reactjs-tag-input";
-
+//import { Tag } from "react-tag-input";
+import ReactTagInput from "@snek-shipyard/react-tag-input";
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track } from "../../../../store/types";
+import { OhrwurmState, Track, Significance } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
   fetchPACTracksAction,
 } from "../../../../store/actions/ohrwurmActions";
+
 //> Style Sheet
-// import "./ohrwurm.scss";
+import "./trackmodal.scss";
+//#endregion
+
+//#region > Types
+type TagType = { name: string; significance: Significance };
+type Tags = TagType[];
 //#endregion
 
 //#region > Interfaces
 interface State {
   loading: boolean;
   error: Array<any>;
-  attendees: Array<any>;
-  tags: Array<any>;
+  attendees: Tags;
+  tags: Tags;
   trackName: string;
   date: Date;
   files: any;
@@ -69,6 +76,15 @@ const truncate = (input: string) =>
   input.length > 5 ? `${input.substring(0, 25)}...` : input;
 //#endregion
 
+//#region > Constant Variables
+const KeyCodes = {
+  comma: 188,
+  enter: 13,
+};
+
+const delimiters = [KeyCodes.comma, KeyCodes.enter];
+//#endregion
+
 //#region > Components
 class TrackModal extends React.Component<Props, State> {
   state: State = {
@@ -86,12 +102,10 @@ class TrackModal extends React.Component<Props, State> {
       const track = this.props.track;
 
       this.setState({
-        attendees: track.attendees.map((attendee, i) => {
-          return { index: i, displayValue: attendee.name };
+        attendees: track.attendees.map((attendee) => {
+          return { name: attendee.name, significance: "LIGHT" };
         }),
-        tags: track.tags.map((tag, i) => {
-          return { index: i, displayValue: tag.name };
-        }),
+        tags: track.tags,
         trackName: track.title,
         date: new Date(track.createdAt),
         files: track.audioFileUrl,
@@ -130,15 +144,6 @@ class TrackModal extends React.Component<Props, State> {
 
   onDrop = async (files: any) => {
     this.setState({ files });
-  };
-
-  onAttendeesChanged = (attendees: any) => {
-    this.setState({ attendees });
-  };
-
-  onTagsChanged = (tags: any) => {
-    this.setState({ tags });
-    console.log(this.state.tags, "###");
   };
 
   render() {
@@ -242,66 +247,26 @@ class TrackModal extends React.Component<Props, State> {
               </Dropzone>
               <br />
               <label>Attendees</label>
-              <TagInput
-                tags={this.state.attendees}
-                onTagsChanged={this.onAttendeesChanged}
-                wrapperStyle={`
-                    -webkit-transform: translate(0%,0%);
-                    -ms-transform: translate(0%,0%);
-                    position: unset;
-                    font-family: inherit;
-                    width: 100%;
-                    background: inherit;
-                    border-radius: 16px;
-                  `}
-                inputStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    padding: 5px;
-                    width: 25%;
-                    border-radius: 16px;
-                  `}
-                tagStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    border-radius: 16px;
-                  `}
-                tagDeleteStyle={`
-                    color: rgba(0,0,0,0.6);
-                  `}
-                placeholder="Attendee"
-              />
+              <span id="attendees">
+                <ReactTagInput
+                  tags={this.state.attendees}
+                  onChange={(attendees: Tags) => this.setState({ attendees })}
+                  placeholder="Type and press enter"
+                  editable={true}
+                  readOnly={false}
+                />
+              </span>
               <br />
               <label>Tags</label>
-              <TagInput
-                tags={this.state.tags}
-                onTagsChanged={this.onTagsChanged}
-                wrapperStyle={`
-                    -webkit-transform: translate(0%,0%);
-                    -ms-transform: translate(0%,0%);
-                    position: unset;
-                    font-family: inherit;
-                    width: 100%;
-                    background: inherit;
-                    border-radius: 16px;
-                  `}
-                inputStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    padding: 5px;
-                    width: 25%;
-                    border-radius: 16px;
-                  `}
-                tagStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    border-radius: 16px;
-                  `}
-                tagDeleteStyle={`
-                    color: rgba(0,0,0,0.6);
-                  `}
-                placeholder="Tag"
-              />
+              <span id="tags">
+                <ReactTagInput
+                  tags={this.state.tags}
+                  onChange={(tags: Tags) => this.setState({ tags })}
+                  placeholder="Type and press enter"
+                  editable={true}
+                  readOnly={false}
+                />
+              </span>
               <div className="text-center mb-4 mt-5">
                 <MDBBtn
                   color="light-green"
