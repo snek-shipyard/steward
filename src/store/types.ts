@@ -77,12 +77,21 @@ export const OHRWURM_SEARCH_TRACKS_REQUEST = "OHRWURM_SEARCH_TRACKS_REQUEST";
 export const OHRWURM_SEARCH_TRACKS_SUCCESS = "OHRWURM_SEARCH_TRACKS_SUCCESS";
 export const OHRWURM_SEARCH_TRACKS_FAILURE = "OHRWURM_SEARCH_TRACKS_FAILURE";
 
+export const OHRWURM_FETCH_MEMBERS_REQUEST = "OHRWURM_FETCH_MEMBERS_REQUEST";
+export const OHRWURM_FETCH_MEMBERS_SUCCESS = "OHRWURM_FETCH_MEMBERS_SUCCESS";
+export const OHRWURM_FETCH_MEMBERS_FAILURE = "OHRWURM_FETCH_MEMBERS_FAILURE";
+
+export interface Member {
+  username: string;
+  isOhrwurmSupervisor?: boolean;
+}
+
 export interface PAC {
   id: number;
   title: string;
   description?: string;
   channelId?: string;
-  members?: { username: string; isOhrwurmSupervisor?: boolean }[];
+  members?: Member[];
 }
 
 export interface Track {
@@ -108,6 +117,9 @@ export interface OhrwurmState extends ErrorState {
     pagination: Pagination;
     items?: Track[];
   };
+  members?: {
+    items?: Member[];
+  };
 }
 
 export type OhrwurmAction = {
@@ -132,7 +144,10 @@ export type OhrwurmAction = {
     | typeof OHRWURM_FETCH_TRACKS_FAILURE
     | typeof OHRWURM_SEARCH_TRACKS_REQUEST
     | typeof OHRWURM_SEARCH_TRACKS_SUCCESS
-    | typeof OHRWURM_SEARCH_TRACKS_FAILURE;
+    | typeof OHRWURM_SEARCH_TRACKS_FAILURE
+    | typeof OHRWURM_FETCH_MEMBERS_REQUEST
+    | typeof OHRWURM_FETCH_MEMBERS_FAILURE
+    | typeof OHRWURM_FETCH_MEMBERS_SUCCESS;
   payload?: OhrwurmState;
 };
 //#endregion

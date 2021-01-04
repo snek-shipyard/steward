@@ -7,6 +7,7 @@ import { OhrwurmState, OhrwurmAction } from "../types";
 const INIT_STATE: OhrwurmState = {
   pacs: undefined,
   tracks: undefined,
+  members: undefined,
   error: undefined,
   errorDetails: undefined,
 };
@@ -52,6 +53,20 @@ const ohrwurmReducer = (
         tracks: payload?.tracks,
       };
     case "OHRWURM_FETCH_TRACKS_FAILURE":
+      return {
+        ...INIT_STATE,
+        error: payload?.error,
+        errorDetails: payload?.errorDetails,
+      };
+    //> Members
+    case "OHRWURM_FETCH_MEMBERS_REQUEST":
+      return state;
+    case "OHRWURM_FETCH_MEMBERS_SUCCESS":
+      return {
+        ...state,
+        members: payload?.members,
+      };
+    case "OHRWURM_FETCH_MEMBERS_FAILURE":
       return {
         ...INIT_STATE,
         error: payload?.error,

@@ -12,7 +12,7 @@ import { SnekClient } from "snek-client";
 
 //> Action Types
 import { RootState } from "../reducers/index";
-import { OhrwurmAction, Pagination, PAC, Track } from "../types";
+import { OhrwurmAction, Pagination, PAC, Track, Member } from "../types";
 //#endregion
 
 //#region > Queries
@@ -23,14 +23,18 @@ const paginationQueryFragment = `
   }
 `;
 
+const memberQueryFragment = `
+  username
+  isOhrwurmSupervisor
+`;
+
 const pacQueryFragment = `
   id
   title
   description
   channelId
   members {
-    username
-    isOhrwurmSupervisor
+    ${memberQueryFragment}
   }
 `;
 
@@ -470,6 +474,58 @@ const fetchPACTracksAction = (
 };
 //#endregion
 
+//#region > Ohrwurm Member Actions
+const fetchMembersAction = (): ThunkAction<
+  void,
+  RootState,
+  ohrwurmArguments,
+  OhrwurmAction
+> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        query getOhrwurmMembers($token: String!) {
+          ohrwurmMembers(token: $token) {
+            ${memberQueryFragment}
+          }
+        }
+      `;
+
+      dispatch({ type: "OHRWURM_FETCH_MEMBERS_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        ohrwurmMembers: Member[];
+      }>("mutation", dataSheet, {});
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      dispatch({
+        type: "OHRWURM_FETCH_MEMBERS_SUCCESS",
+        payload: {
+          members: { items: data?.ohrwurmMembers },
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_FETCH_MEMBERS_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Adding PAC failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+//#endregion
 //#region > Exports
 export {
   fetchPACSAction,
@@ -477,6 +533,7 @@ export {
   addPACAction,
   deletePACAction,
   updatePACAction,
+  fetchMembersAction,
 };
 //#endregion
 
