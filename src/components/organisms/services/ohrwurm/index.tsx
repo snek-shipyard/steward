@@ -25,11 +25,14 @@ import Dropzone from "react-dropzone";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track } from "../../../../store/types";
+import { OhrwurmState, Track, TagType } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
   fetchPACTracksAction,
+  addTrackAction,
+  deleteTrackAction,
+  updateTrackAction,
 } from "../../../../store/actions/ohrwurmActions";
 //> Components
 import { Breadcrumbs } from "../../../atoms";
@@ -56,7 +59,7 @@ interface State {
   trackModal: boolean;
   selectedTrack: Track | undefined;
   error: Array<any>;
-  file: any;
+  audioFile: any;
 }
 interface OwnProps {}
 interface StateProps {
@@ -66,6 +69,15 @@ interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
   fetchPACTracks: (pacId: number, searchQuery?: string) => void;
+  addTrack: (
+    pacId: string,
+    title: string,
+    attendees?: { name: string }[],
+    audioFile?: File,
+    createdAt?: Date,
+    description?: string,
+    tags?: TagType[]
+  ) => void;
 }
 interface Props
   extends OwnProps,
@@ -91,7 +103,7 @@ class Ohrwurm extends React.Component<Props, State> {
     trackModal: false,
     selectedTrack: undefined,
     error: [],
-    file: null,
+    audioFile: null,
   };
 
   componentDidMount = () => {
@@ -180,7 +192,7 @@ class Ohrwurm extends React.Component<Props, State> {
   onDrop = async (files: any) => {
     if (files.length > 0) {
       this.setState({
-        file: files[0],
+        audioFile: files[0],
         error: [],
       });
 
@@ -324,9 +336,10 @@ class Ohrwurm extends React.Component<Props, State> {
         )}
         {this.state.trackModal && (
           <TrackModal
-            file={this.state.file}
+            audioFile={this.state.audioFile}
             toggle={this.toggleTrackModal}
             track={this.state.selectedTrack}
+            addTrack={this.props.addTrack}
           />
         )}
       </>
@@ -341,6 +354,9 @@ const mapStateToProps = (state: RootState) => ({ ohrwurm: state.ohrwurm });
 const mapDispatchToProps = {
   fetchPACS: fetchPACSAction,
   fetchPACTracks: fetchPACTracksAction,
+  addTrack: addTrackAction,
+  deleteTrack: deleteTrackAction,
+  updateTrack: updateTrackAction,
 };
 //#endregion
 

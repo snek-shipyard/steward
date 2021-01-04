@@ -54,6 +54,21 @@ const trackQueryFragment = `
   }
   audioFileUrl
 `;
+
+const trackAddFragment = `
+  id
+  title
+  createdAt
+  audioChannel
+  audioCodec
+  audioBitrate
+  description
+  transcript
+  pac {
+    ${pacQueryFragment}
+  }
+  audioFileUrl
+`;
 //#endregion
 
 //#region > Types
@@ -157,7 +172,7 @@ const fetchPACTracksAction = (
 
       if (searchQuery) {
         query = gql`
-          query allPACTracks($token: String!, $searchQuery: String!, $pac: Int!) {
+          query allPACTracks($token: String!, $searchQuery: String!, $pac: ID!) {
             tracks(token: $token, searchQuery: $searchQuery, perPage: 1000, pac: $pac) {
               ${paginationQueryFragment}
               items{
@@ -170,7 +185,7 @@ const fetchPACTracksAction = (
         variables = { pac: pacId, searchQuery };
       } else {
         query = gql`
-          query allPACTracks($token: String!, $pac: Int!) {
+          query allPACTracks($token: String!, $pac: ID!) {
             tracks(token: $token, perPage: 1000, pac: $pac) {
               ${paginationQueryFragment}
               items{
@@ -247,7 +262,7 @@ const addTrackAction = (
       const dataSheet = gql`
         mutation addTrack(
           $token: String!
-          $pacId: String!
+          $pacId: ID!
           $title: String!
           $attendees: [String]
           $audioFile: Upload
@@ -266,7 +281,7 @@ const addTrackAction = (
             tags: $tags
           ) {
             track {
-              ${trackQueryFragment}
+              ${trackAddFragment}
             }
           }
         }
@@ -343,7 +358,7 @@ const deleteTrackAction = (
   ) => {
     try {
       const dataSheet = gql`
-        mutation deleteTrack($token: String, $id: String!) {
+        mutation deleteTrack($token: String, $id: ID!) {
           deleteOhrwurmMember(token: $token, id: $id) {
             success
           }
@@ -409,7 +424,7 @@ const updateTrackAction = (
       const dataSheet = gql`
         mutation updateTrack(
           $token: String!
-          $id: String!
+          $id: ID!
           $title: String
           $attendees: [String]
           $description: String
@@ -424,7 +439,7 @@ const updateTrackAction = (
             tags: $tags
           ) {
             member {
-              ${trackQueryFragment}
+              ${trackAddFragment}
             }
           }
         }
@@ -481,7 +496,13 @@ const updateTrackAction = (
 //#endregion
 
 //#region > Exports
-export { fetchPACSAction, fetchPACTracksAction };
+export {
+  fetchPACSAction,
+  fetchPACTracksAction,
+  addTrackAction,
+  deleteTrackAction,
+  updateTrackAction,
+};
 //#endregion
 
 /**

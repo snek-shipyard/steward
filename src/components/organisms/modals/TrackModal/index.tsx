@@ -47,16 +47,18 @@ interface State {
   error: Array<any>;
   attendees?: Tags;
   tags?: Tags;
-  trackName?: string;
-  date?: Date;
-  file?: any;
+  title?: string;
+  description?: string;
+  createdAt?: Date;
+  audioFile?: any;
 }
 interface OwnProps {}
 interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
   track: Track | undefined;
-  file: any;
+  addTrack: any;
+  audioFile: any;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -75,15 +77,6 @@ const truncate = (input: string) =>
   input.length > 5 ? `${input.substring(0, 25)}...` : input;
 //#endregion
 
-//#region > Constant Variables
-const KeyCodes = {
-  comma: 188,
-  enter: 13,
-};
-
-const delimiters = [KeyCodes.comma, KeyCodes.enter];
-//#endregion
-
 //#region > Components
 class TrackModal extends React.Component<Props, State> {
   state: State = {
@@ -91,39 +84,46 @@ class TrackModal extends React.Component<Props, State> {
     error: [],
     attendees: [],
     tags: [],
-    trackName: "",
-    date: new Date(),
-    file: null,
+    title: "",
+    description: "",
+    createdAt: new Date(),
+    audioFile: null,
   };
 
   componentWillMount = () => {
     if (this.props.track) {
       const track = this.props.track;
+      const { tags, title, createdAt, audioFile, description } = track;
 
       this.setState({
         attendees: (track.attendees || []).map((attendee) => {
           return { name: attendee.name, significance: "LIGHT" };
         }),
-        tags: track.tags,
-        trackName: track.title,
-        date: track.createdAt,
-        file: track.audioFile,
+        tags,
+        title,
+        description,
+        createdAt,
+        audioFile,
       });
     }
 
-    if (this.props.file) {
+    if (this.props.audioFile) {
       this.setState({
-        file: this.props.file,
+        audioFile: this.props.audioFile,
       });
     }
   };
 
   setTrackName = (e: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({ trackName: e.currentTarget.value });
+    this.setState({ title: e.currentTarget.value });
+  };
+
+  setDescription = (e: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({ description: e.currentTarget.value });
   };
 
   setDate = (e: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({ date: new Date(e.currentTarget.value) });
+    this.setState({ createdAt: new Date(e.currentTarget.value) });
   };
 
   getDisplayDate = (date: Date) => {
@@ -142,15 +142,54 @@ class TrackModal extends React.Component<Props, State> {
   };
 
   onDrop = async (files: any) => {
-    let file = files[0];
+    let audioFile = files[0];
 
-    this.setState({ file });
+    this.setState({ audioFile });
+  };
+
+  onSubmit = async () => {
+    this.setState({ loading: true });
+    let {
+      title,
+      attendees,
+      audioFile,
+      createdAt,
+      description,
+      tags,
+    } = this.state;
+
+    let res = await this.props.addTrack(
+      this.props.ohrwurm.tracks?.pacId,
+      title,
+      (attendees || []).map((attendee) => {
+        return attendee.name;
+      }),
+      audioFile,
+      createdAt,
+      description,
+      tags
+    );
+
+    this.setState({ loading: false });
+    this.props.toggle();
   };
 
   render() {
     return (
       <MDBModal isOpen={true} toggle={this.props.toggle} size="lg">
         <MDBModalBody>
+          {this.state.loading && (
+            <MDBProgress
+              material
+              value={100}
+              animated
+              height="25px"
+              color="success"
+              className="mb-0 pb-0"
+            >
+              Uploading file
+            </MDBProgress>
+          )}
           <MDBRow>
             <MDBCol>
               <MDBInput
@@ -160,9 +199,21 @@ class TrackModal extends React.Component<Props, State> {
                 group
                 type="text"
                 validate
-                value={this.state.trackName}
+                value={this.state.title}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setTrackName(e)
+                }
+              />
+              <MDBInput
+                id="input"
+                className="input-track"
+                label="Description"
+                group
+                type="textarea"
+                validate
+                value={this.state.description}
+                onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                  this.setDescription(e)
                 }
               />
               <MDBInput
@@ -172,7 +223,7 @@ class TrackModal extends React.Component<Props, State> {
                 group
                 type="date"
                 validate
-                value={this.getDisplayDate(this.state.date || new Date())}
+                value={this.getDisplayDate(this.state.createdAt || new Date())}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setDate(e)
                 }
@@ -273,7 +324,7 @@ class TrackModal extends React.Component<Props, State> {
                   color="light-green"
                   type="button"
                   className="btn-block z-depth-2 btn-primary"
-                  onClick={() => alert()}
+                  onClick={() => this.onSubmit()}
                 >
                   Save
                 </MDBBtn>
