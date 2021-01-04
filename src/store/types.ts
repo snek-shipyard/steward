@@ -125,6 +125,7 @@ export interface OhrwurmState extends ErrorState {
     items?: Track[];
   };
   members?: {
+    generatedPassword?: string;
     items?: Member[];
   };
 }

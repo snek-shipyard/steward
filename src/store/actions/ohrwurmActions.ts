@@ -562,13 +562,13 @@ const addMemberAction = (
 
       if (data) {
         members.items?.push(data.addOhrwurmMember.member);
+        members.generatedPassword = data.addOhrwurmMember.generatedPassword;
       }
 
       dispatch({
         type: "OHRWURM_ADD_PAC_SUCCESS",
         payload: {
           members,
-          generatedPassword: data?.addOhrwurmMember.generatedPassword,
         },
       });
     } catch (ex) {
