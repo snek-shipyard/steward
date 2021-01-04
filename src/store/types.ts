@@ -85,12 +85,13 @@ export const OHRWURM_ADD_MEMBER_SUCCESS = "OHRWURM_ADD_MEMBER_SUCCESS";
 export const OHRWURM_ADD_MEMBER_FAILURE = "OHRWURM_ADD_MEMBER_FAILURE";
 
 export interface Member {
+  id: string;
   username: string;
   isOhrwurmSupervisor?: boolean;
 }
 
 export interface PAC {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   channelId?: string;
@@ -98,7 +99,7 @@ export interface PAC {
 }
 
 export interface Track {
-  id: number;
+  id: string;
   title: string;
   createdAt: string;
   description: string;

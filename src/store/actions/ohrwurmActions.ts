@@ -24,6 +24,7 @@ const paginationQueryFragment = `
 `;
 
 const memberQueryFragment = `
+  id
   username
   isOhrwurmSupervisor
 `;
@@ -177,7 +178,7 @@ const addPACAction = (
             members: $members
           ) {
             pac {
-              id
+              ${pacQueryFragment}
             }
           }
         }
@@ -186,9 +187,7 @@ const addPACAction = (
 
       const { data, errors } = await getClientSnek().session.runner<{
         addPac: {
-          pac: {
-            id: string;
-          };
+          pac: PAC;
         };
       }>("mutation", dataSheet, { title, description, channelId, members });
 
@@ -202,15 +201,15 @@ const addPACAction = (
         pacs = { pagination: { total: 0, nextPage: 0 }, items: [] };
       }
 
-      pacs?.items.push({
-        id: data?.addPac.pac.id ? parseInt(data?.addPac.pac.id) : -1,
-        title,
-        description,
-        channelId,
-        members: members?.map((elem) => {
-          return { username: elem };
-        }),
-      });
+      if (data) {
+        pacs?.items.push({
+          id: data.addPac.pac.id,
+          title,
+          description,
+          channelId,
+          members: data.addPac.pac.members,
+        });
+      }
 
       dispatch({
         type: "OHRWURM_ADD_PAC_SUCCESS",
@@ -234,7 +233,7 @@ const addPACAction = (
 };
 
 const deletePACAction = (
-  id: number
+  id: string
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
     dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
@@ -320,8 +319,7 @@ const updatePACAction = (
             members: $members
           ) {
             pac {
-              id
-              title
+              ${pacQueryFragment}
             }
           }
         }
@@ -330,10 +328,7 @@ const updatePACAction = (
 
       const { data, errors } = await getClientSnek().session.runner<{
         updatePac: {
-          pac: {
-            id: string;
-            title: string;
-          };
+          pac: PAC;
         };
       }>("mutation", dataSheet, { id, title, description, channelId, members });
 
@@ -344,22 +339,14 @@ const updatePACAction = (
       // add new pac to current pac items
       let pacs = getState().ohrwurm.pacs;
       if (pacs && data) {
-        const index = pacs.items.findIndex((item) => item.id.toString() === id);
-        const updated: PAC = {
-          id: parseInt(id),
-          title: data.updatePac.pac.title,
-          description,
-          channelId,
-          members: members?.map((elem) => {
-            return { username: elem };
-          }),
-        };
+        const index = pacs.items.findIndex((item) => item.id === id);
 
         const items = [
           ...pacs.items.slice(0, index),
-          updated,
+          data.updatePac.pac,
           ...pacs.items.slice(index + 1),
         ];
+
         pacs.items = [...items];
       }
 
