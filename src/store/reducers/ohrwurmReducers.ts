@@ -22,23 +22,23 @@ const ohrwurmReducer = (
 
   switch (type) {
     //> Get PACs
-    case "OHRWURM_FETCH_PACS_REQUEST" ||
-      "OHRWURM_ADD_PAC_REQUEST" ||
-      "OHRWURM_DELETE_PAC_REQUEST" ||
-      "OHRWURM_UPDATE_PAC_REQUEST":
+    case "OHRWURM_FETCH_PACS_REQUEST":
+    case "OHRWURM_ADD_PAC_REQUEST":
+    case "OHRWURM_DELETE_PAC_REQUEST":
+    case "OHRWURM_UPDATE_PAC_REQUEST":
       return state;
-    case "OHRWURM_FETCH_PACS_SUCCESS" ||
-      "OHRWURM_ADD_PAC_SUCCESS" ||
-      "OHRWURM_DELETE_PAC_SUCCESS" ||
-      "OHRWURM_UPDATE_PAC_SUCCESS":
+    case "OHRWURM_FETCH_PACS_SUCCESS":
+    case "OHRWURM_ADD_PAC_SUCCESS":
+    case "OHRWURM_DELETE_PAC_SUCCESS":
+    case "OHRWURM_UPDATE_PAC_SUCCESS":
       return {
         ...state,
         pacs: payload?.pacs,
       };
-    case "OHRWURM_FETCH_PACS_FAILURE" ||
-      "OHRWURM_ADD_PAC_FAILURE" ||
-      "OHRWURM_DELETE_PAC_FAILURE" ||
-      "OHRWURM_UPDATE_PAC_FAILURE":
+    case "OHRWURM_FETCH_PACS_FAILURE":
+    case "OHRWURM_ADD_PAC_FAILURE":
+    case "OHRWURM_DELETE_PAC_FAILURE":
+    case "OHRWURM_UPDATE_PAC_FAILURE":
       return {
         ...INIT_STATE,
         error: payload?.error,
@@ -59,14 +59,17 @@ const ohrwurmReducer = (
         errorDetails: payload?.errorDetails,
       };
     //> Members
-    case "OHRWURM_FETCH_MEMBERS_REQUEST" || "OHRWURM_ADD_MEMBER_REQUEST":
+    case "OHRWURM_FETCH_MEMBERS_REQUEST":
+    case "OHRWURM_ADD_MEMBER_REQUEST":
       return state;
-    case "OHRWURM_FETCH_MEMBERS_SUCCESS" || "OHRWURM_ADD_MEMBER_SUCCESS":
+    case "OHRWURM_FETCH_MEMBERS_SUCCESS":
+    case "OHRWURM_ADD_MEMBER_SUCCESS":
       return {
         ...state,
         members: payload?.members,
       };
-    case "OHRWURM_FETCH_MEMBERS_FAILURE" || "OHRWURM_ADD_MEMBER_FAILURE":
+    case "OHRWURM_FETCH_MEMBERS_FAILURE":
+    case "OHRWURM_ADD_MEMBER_FAILURE":
       return {
         ...INIT_STATE,
         error: payload?.error,
