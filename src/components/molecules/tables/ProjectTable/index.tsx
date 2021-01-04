@@ -88,7 +88,7 @@ class ProjectTable extends React.Component<
         hover
         scrollY
         searching={false}
-        maxHeight="300px"
+        maxHeight="100%"
         data={this.state}
       />
     );
