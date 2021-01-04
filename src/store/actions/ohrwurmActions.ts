@@ -359,7 +359,7 @@ const deleteTrackAction = (
     try {
       const dataSheet = gql`
         mutation deleteTrack($token: String, $id: ID!) {
-          deleteOhrwurmMember(token: $token, id: $id) {
+          deleteTrack(token: $token, id: $id) {
             success
           }
         }

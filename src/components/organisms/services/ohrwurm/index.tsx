@@ -78,6 +78,7 @@ interface DispatchProps {
     description?: string,
     tags?: TagType[]
   ) => void;
+  deleteTrack: (id: string) => void;
 }
 interface Props
   extends OwnProps,
@@ -178,8 +179,8 @@ class Ohrwurm extends React.Component<Props, State> {
     }
   };
 
-  deleteTrack = (track: Track) => {
-    console.log(track);
+  deleteTrack = async (track: Track) => {
+    await this.props.deleteTrack(track.id.toString());
   };
 
   editTrack = (track: Track) => {
