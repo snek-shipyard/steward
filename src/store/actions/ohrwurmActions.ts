@@ -562,7 +562,10 @@ const addMemberAction = (
 
       if (data) {
         members.items?.push(data.addOhrwurmMember.member);
-        members.generatedPassword = data.addOhrwurmMember.generatedPassword;
+        members.added = {
+          username: data.addOhrwurmMember.member.username,
+          generatedPassword: data.addOhrwurmMember.generatedPassword,
+        };
       }
 
       dispatch({
