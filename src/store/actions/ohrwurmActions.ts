@@ -525,6 +525,79 @@ const fetchMembersAction = (): ThunkAction<
     }
   };
 };
+
+const addMemberAction = (
+  username: string,
+  isOhrwurmSupervisor?: boolean
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation addPAC(
+          $token: String!
+          $username: String!
+          $isSupervisor: Boolean
+        ) {
+          addOhrwurmMember(
+            token: $token
+            username: $username
+            isSupervisor: $isSupervisor
+          ) {
+            member {
+              ${memberQueryFragment}
+            }
+            generatedPassword
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_ADD_MEMBER_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        addOhrwurmMember: {
+          member: Member;
+          generatedPassword: string;
+        };
+      }>("mutation", dataSheet, { username, isOhrwurmSupervisor });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+      // add new pac to current pac items
+      let members = getState().ohrwurm.members;
+
+      if (!members) {
+        members = { items: [] };
+      }
+
+      if (data) {
+        members.items?.push(data.addOhrwurmMember.member);
+      }
+
+      dispatch({
+        type: "OHRWURM_ADD_PAC_SUCCESS",
+        payload: {
+          members,
+          generatedPassword: data?.addOhrwurmMember.generatedPassword,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_ADD_PAC_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Adding Member failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
 //#endregion
 //#region > Exports
 export {
@@ -534,6 +607,7 @@ export {
   deletePACAction,
   updatePACAction,
   fetchMembersAction,
+  addMemberAction,
 };
 //#endregion
 
