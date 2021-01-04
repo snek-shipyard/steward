@@ -82,7 +82,7 @@ export interface PAC {
   title: string;
   description?: string;
   channelId?: string;
-  members?: string[];
+  members?: { username: string; isOhrwurmSupervisor?: boolean }[];
 }
 
 export interface Track {

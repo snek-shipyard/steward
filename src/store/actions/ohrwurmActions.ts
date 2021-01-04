@@ -30,6 +30,7 @@ const pacQueryFragment = `
   channelId
   members {
     username
+    isOhrwurmSupervisor
   }
 `;
 
@@ -202,7 +203,9 @@ const addPACAction = (
         title,
         description,
         channelId,
-        members,
+        members: members?.map((elem) => {
+          return { username: elem };
+        }),
       });
 
       dispatch({
@@ -343,7 +346,9 @@ const updatePACAction = (
           title: data.updatePac.pac.title,
           description,
           channelId,
-          members,
+          members: members?.map((elem) => {
+            return { username: elem };
+          }),
         };
 
         const items = [
