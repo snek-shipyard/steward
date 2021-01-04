@@ -12,7 +12,7 @@ import { SnekClient } from "snek-client";
 
 //> Action Types
 import { RootState } from "../reducers/index";
-import { OhrwurmAction, Pagination, PAC, Track } from "../types";
+import { OhrwurmAction, Pagination, PAC, Track, Member } from "../types";
 //#endregion
 
 //#region > Queries
@@ -23,10 +23,20 @@ const paginationQueryFragment = `
   }
 `;
 
+const memberQueryFragment = `
+  id
+  username
+  isOhrwurmSupervisor
+`;
+
 const pacQueryFragment = `
   id
   title
   description
+  channelId
+  members {
+    ${memberQueryFragment}
+  }
 `;
 
 const trackQueryFragment = `
@@ -62,7 +72,7 @@ type ohrwurmArguments = {
 };
 //#endregion
 
-//#region > Ohrwurm Actions
+//#region > Ohrwurm PAC Actions
 const fetchPACSAction = (
   searchQuery?: string
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
@@ -140,8 +150,231 @@ const fetchPACSAction = (
   };
 };
 
+const addPACAction = (
+  title: string,
+  description?: string,
+  channelId?: string,
+  members?: string[]
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation addPAC(
+          $token: String!
+          $title: String!
+          $description: String
+          $channelId: String
+          $members: [String]
+        ) {
+          addPac(
+            token: $token
+            title: $title
+            description: $description
+            channelId: $channelId
+            members: $members
+          ) {
+            pac {
+              ${pacQueryFragment}
+            }
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_ADD_PAC_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        addPac: {
+          pac: PAC;
+        };
+      }>("mutation", dataSheet, { title, description, channelId, members });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+      // add new pac to current pac items
+      let pacs = getState().ohrwurm.pacs;
+
+      if (!pacs) {
+        pacs = { pagination: { total: 0, nextPage: 0 }, items: [] };
+      }
+
+      if (data) {
+        pacs?.items.push({
+          id: data.addPac.pac.id,
+          title,
+          description,
+          channelId,
+          members: data.addPac.pac.members,
+        });
+      }
+
+      dispatch({
+        type: "OHRWURM_ADD_PAC_SUCCESS",
+        payload: {
+          pacs,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_ADD_PAC_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Adding PAC failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+
+const deletePACAction = (
+  id: string
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation deletePAC($token: String!, $id: ID!) {
+          deletePac(token: $token, id: $id) {
+            success
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_DELETE_PAC_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        deletePAC: { success: string };
+      }>("mutation", dataSheet, { id });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new pac to current pac items
+      let pacs = getState().ohrwurm.pacs;
+
+      if (!pacs) {
+        pacs = { pagination: { total: 0, nextPage: 0 }, items: [] };
+      }
+
+      pacs.items = pacs.items.filter((elem) => elem.id !== id);
+
+      dispatch({
+        type: "OHRWURM_DELETE_PAC_SUCCESS",
+        payload: {
+          pacs,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_DELETE_PAC_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Deleting PAC failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+
+const updatePACAction = (
+  id: string,
+  title?: string,
+  description?: string,
+  channelId?: string,
+  members?: string[]
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation updatePAC(
+          $token: String!
+          $id: ID!
+          $title: String
+          $description: String
+          $channelId: String
+          $members: [String]
+        ) {
+          updatePac(
+            token: $token
+            id: $id
+            title: $title
+            description: $description
+            channelId: $channelId
+            members: $members
+          ) {
+            pac {
+              ${pacQueryFragment}
+            }
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_UPDATE_PAC_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        updatePac: {
+          pac: PAC;
+        };
+      }>("mutation", dataSheet, { id, title, description, channelId, members });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new pac to current pac items
+      let pacs = getState().ohrwurm.pacs;
+      if (pacs && data) {
+        const index = pacs.items.findIndex((item) => item.id === id);
+
+        const items = [
+          ...pacs.items.slice(0, index),
+          data.updatePac.pac,
+          ...pacs.items.slice(index + 1),
+        ];
+
+        pacs.items = [...items];
+      }
+
+      dispatch({
+        type: "OHRWURM_UPDATE_PAC_SUCCESS",
+        payload: {
+          pacs,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_UPDATE_PAC_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Updating PAC failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+//#endregion
+
+//#region > Ohrwurm Track Actions
 const fetchPACTracksAction = (
-  pacId: number,
+  pacId: string,
   searchQuery?: string
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
@@ -155,7 +388,7 @@ const fetchPACTracksAction = (
 
       if (searchQuery) {
         query = gql`
-          query allPACTracks($token: String!, $searchQuery: String!, $pac: Int!) {
+          query allPACTracks($token: String!, $searchQuery: String!, $pac: ID!) {
             tracks(token: $token, searchQuery: $searchQuery, perPage: 1000, pac: $pac) {
               ${paginationQueryFragment}
               items{
@@ -168,7 +401,7 @@ const fetchPACTracksAction = (
         variables = { pac: pacId, searchQuery };
       } else {
         query = gql`
-          query allPACTracks($token: String!, $pac: Int!) {
+          query allPACTracks($token: String!, $pac: ID!) {
             tracks(token: $token, perPage: 1000, pac: $pac) {
               ${paginationQueryFragment}
               items{
@@ -228,8 +461,284 @@ const fetchPACTracksAction = (
 };
 //#endregion
 
+//#region > Ohrwurm Member Actions
+const fetchMembersAction = (): ThunkAction<
+  void,
+  RootState,
+  ohrwurmArguments,
+  OhrwurmAction
+> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        query getOhrwurmMembers($token: String!) {
+          ohrwurmMembers(token: $token) {
+            ${memberQueryFragment}
+          }
+        }
+      `;
+
+      dispatch({ type: "OHRWURM_FETCH_MEMBERS_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        ohrwurmMembers: Member[];
+      }>("mutation", dataSheet, {});
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      dispatch({
+        type: "OHRWURM_FETCH_MEMBERS_SUCCESS",
+        payload: {
+          members: { items: data?.ohrwurmMembers },
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_FETCH_MEMBERS_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Adding PAC failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+
+const addMemberAction = (
+  username: string,
+  isOhrwurmSupervisor?: boolean
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation addPAC(
+          $token: String!
+          $username: String!
+          $isSupervisor: Boolean
+        ) {
+          addOhrwurmMember(
+            token: $token
+            username: $username
+            isSupervisor: $isSupervisor
+          ) {
+            member {
+              ${memberQueryFragment}
+            }
+            generatedPassword
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_ADD_MEMBER_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        addOhrwurmMember: {
+          member: Member;
+          generatedPassword: string;
+        };
+      }>("mutation", dataSheet, { username, isOhrwurmSupervisor });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+      // add new pac to current pac items
+      let members = getState().ohrwurm.members;
+
+      if (!members) {
+        members = { items: [] };
+      }
+
+      if (data) {
+        members.items?.push(data.addOhrwurmMember.member);
+        members.added = {
+          username: data.addOhrwurmMember.member.username,
+          generatedPassword: data.addOhrwurmMember.generatedPassword,
+        };
+      }
+
+      dispatch({
+        type: "OHRWURM_ADD_PAC_SUCCESS",
+        payload: {
+          members,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_ADD_PAC_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Adding Member failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+
+const deleteMemberAction = (
+  username: string
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation deletePAC($token: String!, $username: String!) {
+          deleteOhrwurmMember(token: $token, username: $username) {
+            success
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_DELETE_MEMBER_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        deletePAC: { success: string };
+      }>("mutation", dataSheet, { username });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new pac to current pac items
+      let members = getState().ohrwurm.members;
+
+      if (!members) {
+        members = { items: [] };
+      }
+
+      if (data) {
+        members.items = members.items?.filter(
+          (elem) => elem.username !== username
+        );
+      }
+
+      dispatch({
+        type: "OHRWURM_DELETE_MEMBER_SUCCESS",
+        payload: {
+          members,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_DELETE_MEMBER_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Deleting Member failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+
+const updateMemberAction = (
+  username: string,
+  isSupervisor: boolean
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation updateOhrwurmMember(
+          $token: String!
+          $username: String!
+          $isSupervisor: Boolean!
+        ) {
+          updateOhrwurmMember(
+            token: $token
+            username: $username
+            isSupervisor: $isSupervisor
+          ) {
+            member {
+              ${memberQueryFragment}
+            }
+          }
+        }
+      `;
+
+      dispatch({ type: "OHRWURM_UPDATE_MEMBER_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        updateOhrwurmMember: {
+          member: Member;
+        };
+      }>("mutation", dataSheet, { username, isSupervisor });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new pac to current pac items
+      let members = getState().ohrwurm.members;
+      if (members?.items && data) {
+        const index = members.items?.findIndex(
+          (item) => item.username === username
+        );
+
+        const items = [
+          ...members.items.slice(0, index),
+          data.updateOhrwurmMember.member,
+          ...members.items.slice(index + 1),
+        ];
+
+        members.items = [...items];
+      }
+
+      dispatch({
+        type: "OHRWURM_UPDATE_MEMBER_SUCCESS",
+        payload: {
+          members,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_UPDATE_MEMBER_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Updating Member failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+//#endregion
+
 //#region > Exports
-export { fetchPACSAction, fetchPACTracksAction };
+export {
+  fetchPACSAction,
+  fetchPACTracksAction,
+  addPACAction,
+  deletePACAction,
+  updatePACAction,
+  fetchMembersAction,
+  addMemberAction,
+  deleteMemberAction,
+  updateMemberAction,
+};
 //#endregion
 
 /**

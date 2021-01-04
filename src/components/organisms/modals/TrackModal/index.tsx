@@ -55,7 +55,7 @@ interface StateProps {
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
-  fetchPACTracks: (pacId: number, searchQuery?: string) => void;
+  fetchPACTracks: (pacId: string, searchQuery?: string) => void;
 }
 interface Props
   extends OwnProps,
