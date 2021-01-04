@@ -585,6 +585,66 @@ const addMemberAction = (
     }
   };
 };
+
+const deleteMemberAction = (
+  username: string
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation deletePAC($token: String!, $username: String!) {
+          deleteOhrwurmMember(token: $token, username: $username) {
+            success
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_DELETE_MEMBER_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        deletePAC: { success: string };
+      }>("mutation", dataSheet, { username });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new pac to current pac items
+      let members = getState().ohrwurm.members;
+
+      if (!members) {
+        members = { items: [] };
+      }
+
+      if (data) {
+        members.items = members.items?.filter(
+          (elem) => elem.username !== username
+        );
+      }
+
+      dispatch({
+        type: "OHRWURM_DELETE_MEMBER_SUCCESS",
+        payload: {
+          members,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_DELETE_MEMBER_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Deleting Member failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
 //#endregion
 //#region > Exports
 export {
@@ -595,6 +655,7 @@ export {
   updatePACAction,
   fetchMembersAction,
   addMemberAction,
+  deleteMemberAction,
 };
 //#endregion
 
