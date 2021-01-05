@@ -12,7 +12,14 @@ import { SnekClient } from "snek-client";
 
 //> Action Types
 import { RootState } from "../reducers/index";
-import { OhrwurmAction, Pagination, PAC, Track, TagType, Member } from "../types";
+import {
+  OhrwurmAction,
+  Pagination,
+  PAC,
+  Track,
+  TagType,
+  Member,
+} from "../types";
 //#endregion
 
 //#region > Queries
@@ -540,7 +547,11 @@ const addTrackAction = (
       let tracks = getState().ohrwurm.tracks;
 
       if (!tracks) {
-        tracks = { pacId: 0, pagination: { total: 0, nextPage: 0 }, items: [] };
+        tracks = {
+          pacId: "0",
+          pagination: { total: 0, nextPage: 0 },
+          items: [],
+        };
       }
 
       if (data) {
@@ -611,7 +622,11 @@ const deleteTrackAction = (
       let tracks = getState().ohrwurm.tracks;
 
       if (!tracks) {
-        tracks = { pacId: 0, pagination: { total: 0, nextPage: 0 }, items: [] };
+        tracks = {
+          pacId: "0",
+          pagination: { total: 0, nextPage: 0 },
+          items: [],
+        };
       }
 
       if (data) {

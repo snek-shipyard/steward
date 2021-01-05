@@ -68,7 +68,7 @@ interface StateProps {
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
-  fetchPACTracks: (pacId: number, searchQuery?: string) => void;
+  fetchPACTracks: (pacId: string, searchQuery?: string) => void;
   addTrack: (
     pacId: string,
     title: string,
@@ -125,7 +125,6 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   selectProject = (index: string) => {
-    console.log(this.state.editingProject, "XXXXXXXXXXXXXXXXXXX");
     if (!this.state.editingProject) {
       this.props.fetchPACTracks(index);
       this.setState({ selectedProjectIndex: index, searchQuery: "" });
