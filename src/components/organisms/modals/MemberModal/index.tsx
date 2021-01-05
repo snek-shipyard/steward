@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track } from "../../../../store/types";
+import { OhrwurmState, Track, Member } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
@@ -33,13 +33,18 @@ import "./membermodal.scss";
 
 //#region > Interfaces
 interface State {
-  name: string;
   searchQuery?: string;
+  isOhrwurmSupervisor?: boolean;
+  username: string;
+  editing: boolean;
 }
 interface OwnProps {}
 interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
+  addMember: any;
+  updateMember: any;
+  username: string;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -61,18 +66,50 @@ const truncate = (input: string) =>
 //#region > Components
 class MemberModal extends React.Component<Props, State> {
   state: State = {
-    name: "name",
     searchQuery: "",
+    username: "",
+    isOhrwurmSupervisor: false,
+    editing: false,
   };
 
-  setProjectName = (e: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({ name: e.currentTarget.value });
+  componentWillMount = () => {
+    if (this.props.username) {
+      (this.props.ohrwurm.members?.items || []).map((member: Member) => {
+        if (member.username == this.props.username) {
+          this.setState({
+            username: member.username,
+            isOhrwurmSupervisor: member.isOhrwurmSupervisor,
+            editing: true,
+          });
+        }
+      });
+    }
+  };
+
+  setUsername = (e: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({ username: e.currentTarget.value });
+  };
+
+  setSupervisor = (e: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({ isOhrwurmSupervisor: e.currentTarget.checked });
   };
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
 
     // Add search for users
+  };
+
+  onSubmit = async () => {
+    let { username, isOhrwurmSupervisor } = this.state;
+
+    if (this.state.editing) {
+      await this.props.updateMember(username, isOhrwurmSupervisor);
+    } else {
+      await this.props.addMember(username, isOhrwurmSupervisor);
+    }
+
+    this.props.toggle();
   };
 
   render() {
@@ -93,12 +130,21 @@ class MemberModal extends React.Component<Props, State> {
                 group
                 type="text"
                 validate
-                value={this.state.name}
+                value={this.state.username}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
-                  this.setProjectName(e)
+                  this.setUsername(e)
                 }
               />
-
+              <MDBInput
+                label="Supervisor"
+                type="checkbox"
+                id="checkbox1"
+                checked={this.state.isOhrwurmSupervisor}
+                onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                  this.setSupervisor(e)
+                }
+              />
+              <br />
               <label>Projects</label>
               <div className="rounded mb-0 border border-light">
                 <div className="mb-0">
@@ -150,7 +196,7 @@ class MemberModal extends React.Component<Props, State> {
                   color="light-green"
                   type="button"
                   className="z-depth-2 btn-primary"
-                  onClick={() => alert()}
+                  onClick={() => this.onSubmit()}
                 >
                   Save
                 </MDBBtn>

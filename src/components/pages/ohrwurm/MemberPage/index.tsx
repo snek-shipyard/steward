@@ -40,6 +40,8 @@ import {
 interface State {
   searchQuery: string;
   memberModal: boolean;
+  username: string;
+  editing: boolean;
 }
 interface OwnProps {}
 interface StateProps {
@@ -65,14 +67,21 @@ class MemberPage extends React.Component<Props, State> {
   state: State = {
     searchQuery: "",
     memberModal: false,
+    username: "",
+    editing: false,
   };
 
-  deleteUser = () => {
-    alert();
+  componentDidMount = () => {
+    this.props.fetchMembers();
   };
 
-  editUser = () => {
-    alert();
+  deleteUser = async (username: string) => {
+    await this.props.deleteMember(username);
+  };
+
+  editUser = (username: string) => {
+    this.setState({ username });
+    this.toggleMemberModal();
   };
 
   search = (value: string) => {
@@ -84,6 +93,9 @@ class MemberPage extends React.Component<Props, State> {
     this.setState({
       memberModal: !this.state.memberModal,
     });
+    if (this.state.memberModal) {
+      this.setState({ username: "" });
+    }
   };
 
   render() {
@@ -119,13 +131,18 @@ class MemberPage extends React.Component<Props, State> {
             </MDBCol>
           </MDBRow>
           <MemberTable
-            entries={[]}
-            onDeleteClick={() => this.deleteUser()}
-            onEditClick={() => this.editUser()}
+            entries={this.props.ohrwurm.members?.items}
+            onDeleteClick={(username: string) => this.deleteUser(username)}
+            onEditClick={(username: string) => this.editUser(username)}
           ></MemberTable>
         </MDBContainer>
         {this.state.memberModal && (
-          <MemberModal toggle={this.toggleMemberModal} />
+          <MemberModal
+            toggle={this.toggleMemberModal}
+            username={this.state.username}
+            addMember={this.props.addMember}
+            updateMember={this.props.updateMember}
+          />
         )}
       </>
     );

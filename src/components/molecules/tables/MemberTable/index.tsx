@@ -24,14 +24,14 @@ import { Member } from "../../../../store/types";
 //#region > Components
 class MemberTable extends React.Component<
   {
-    entries: Member[];
+    entries?: Member[];
     onDeleteClick: (index: string) => void;
     onEditClick: (index: string) => void;
   },
   {}
 > {
   generateRows = () => {
-    return this.props.entries.map((e) => {
+    return (this.props.entries || []).map((e) => {
       const { id, username, isOhrwurmSupervisor } = e;
 
       return {
@@ -64,11 +64,15 @@ class MemberTable extends React.Component<
                 <MDBIcon icon="ellipsis-v" />
               </MDBDropdownToggle>
               <MDBDropdownMenu color="danger">
-                <MDBDropdownItem onClick={() => this.props.onEditClick(e.id)}>
+                <MDBDropdownItem
+                  onClick={() => this.props.onEditClick(e.username)}
+                >
                   {"View"}
                 </MDBDropdownItem>
                 <MDBDropdownItem divider />
-                <MDBDropdownItem onClick={() => this.props.onDeleteClick(e.id)}>
+                <MDBDropdownItem
+                  onClick={() => this.props.onDeleteClick(e.username)}
+                >
                   <MDBIcon
                     className="red-text pr-3"
                     icon="trash"
