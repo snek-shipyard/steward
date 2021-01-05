@@ -19,7 +19,7 @@ import {
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { UserState } from "../../../../store/types";
+import { UserState, OhrwurmState } from "../../../../store/types";
 //> Store Actions
 import { loginAction } from "../../../../store/actions/userActions";
 //> Service Registry
@@ -28,6 +28,12 @@ import Services from "../../../../serviceRegistry.json";
 import { Breadcrumbs } from "../../../atoms";
 import { LoginForm, ServiceGroup, MemberTable } from "../../../molecules";
 import { MemberModal } from "../../../organisms/modals";
+import {
+  addMemberAction,
+  deleteMemberAction,
+  fetchMembersAction,
+  updateMemberAction,
+} from "../../../../store/actions/ohrwurmActions";
 //#endregion
 
 //#region > Interfaces
@@ -35,9 +41,15 @@ interface State {
   searchQuery: string;
   memberModal: boolean;
 }
-interface OwnProps {}
+interface OwnProps {
+  fetchMembersAction: () => void;
+  addMemberAction: (username: string, isOhrwurmSupervisor?: boolean) => void;
+  deleteMemberAction: (username: string) => void;
+  updateMemberAction: (username: string, isOhrwurmSupervisor: boolean) => void;
+}
 interface StateProps {
   user: UserState;
+  ohrwurm: OhrwurmState;
 }
 interface Props extends OwnProps, StateProps, RouteComponentProps {}
 //#endregion
@@ -60,7 +72,6 @@ class MemberPage extends React.Component<Props, State> {
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
-
     // Add search for users
   };
 
@@ -118,10 +129,17 @@ class MemberPage extends React.Component<Props, State> {
 //#endregion
 
 //#region > Redux Mapping
-const mapStateToProps = (state: RootState) => ({ user: state.user });
+const mapStateToProps = (state: RootState) => ({
+  user: state.user,
+  ohrwurm: state.ohrwurm,
+});
 
 const mapDispatchToProps = {
   login: loginAction,
+  fetchMember: fetchMembersAction,
+  addMember: addMemberAction,
+  deleteMember: deleteMemberAction,
+  updateMember: updateMemberAction,
 };
 //#endregion
 
