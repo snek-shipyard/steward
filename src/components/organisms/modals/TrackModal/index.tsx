@@ -20,37 +20,53 @@ import {
 import { connect } from "react-redux";
 // Contains the functionality for uploading a file
 import Dropzone from "react-dropzone";
+// Contains functionality to display time
+import moment from "moment";
 // Contains the functionality for tag inputs
-import { TagInput } from "reactjs-tag-input";
-
+import ReactTagInput from "@snek-shipyard/react-tag-input";
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track } from "../../../../store/types";
+import {
+  OhrwurmState,
+  Track,
+  TagType,
+  Significance,
+} from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
   fetchPACTracksAction,
 } from "../../../../store/actions/ohrwurmActions";
+
 //> Style Sheet
-// import "./ohrwurm.scss";
+import "./trackmodal.scss";
+//#endregion
+
+//#region > Types
+type Tags = TagType[];
 //#endregion
 
 //#region > Interfaces
 interface State {
   loading: boolean;
   error: Array<any>;
-  attendees: Array<any>;
-  tags: Array<any>;
-  trackName: string;
-  date: Date;
-  files: any;
+  attendees?: Tags;
+  tags?: Tags;
+  title?: string;
+  description?: string;
+  createdAt?: Date;
+  audioFile?: any;
+  audioFileUrl?: string;
+  editing: boolean;
 }
 interface OwnProps {}
 interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
   track: Track | undefined;
-  files: any;
+  addTrack: any;
+  updateTrack: any;
+  audioFile: any;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -76,75 +92,155 @@ class TrackModal extends React.Component<Props, State> {
     error: [],
     attendees: [],
     tags: [],
-    trackName: "",
-    date: new Date(),
-    files: null,
+    title: "",
+    description: "",
+    createdAt: new Date(),
+    audioFile: null,
+    audioFileUrl: "",
+    editing: false,
   };
 
   componentWillMount = () => {
     if (this.props.track) {
       const track = this.props.track;
+      const {
+        tags,
+        title,
+        createdAt,
+        audioFile,
+        description,
+        attendees,
+        audioFileUrl,
+      } = track;
 
       this.setState({
-        attendees: track.attendees.map((attendee, i) => {
-          return { index: i, displayValue: attendee.name };
+        attendees: (attendees || []).map((attendee) => {
+          return { name: attendee.name, significance: "LIGHT" };
         }),
-        tags: track.tags.map((tag, i) => {
-          return { index: i, displayValue: tag.name };
+        tags: (tags || []).map((tag) => {
+          return {
+            name: tag.name,
+            significance: tag.significance.toUpperCase() as Significance,
+          };
         }),
-        trackName: track.title,
-        date: new Date(track.createdAt),
-        files: track.audioFileUrl,
+        title,
+        description,
+        createdAt,
+        audioFile,
+        audioFileUrl,
+        editing: true,
       });
     }
 
-    if (this.props.files) {
+    if (this.props.audioFile) {
       this.setState({
-        files: this.props.files,
+        audioFile: this.props.audioFile,
       });
     }
   };
 
   setTrackName = (e: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({ trackName: e.currentTarget.value });
+    this.setState({ title: e.currentTarget.value });
+  };
+
+  setDescription = (e: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({ description: e.currentTarget.value });
   };
 
   setDate = (e: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({ date: new Date(e.currentTarget.value) });
-  };
-
-  getDisplayDate = (date: Date) => {
-    let dateString: string = "";
-    date
-      .toLocaleDateString()
-      .split("/")
-      .reverse()
-      .map((part: string) => {
-        if (part.length < 2) {
-          part = "0" + part;
-        }
-        dateString += part + "-";
-      });
-    return dateString.slice(0, -1);
+    this.setState({ createdAt: new Date(e.currentTarget.value) });
   };
 
   onDrop = async (files: any) => {
-    this.setState({ files });
+    let audioFile = files[0];
+
+    this.setState({ audioFile });
   };
 
-  onAttendeesChanged = (attendees: any) => {
-    this.setState({ attendees });
-  };
+  onSubmit = async () => {
+    this.setState({ loading: true });
 
-  onTagsChanged = (tags: any) => {
-    this.setState({ tags });
-    console.log(this.state.tags, "###");
+    let {
+      title,
+      attendees,
+      audioFile,
+      createdAt,
+      description,
+      tags,
+    } = this.state;
+
+    let attendeesList: { name: string }[] | undefined = (attendees || []).map(
+      (attendee) => {
+        return { name: attendee.name };
+      }
+    );
+
+    if (this.state.editing) {
+      const id = this.props.track?.id;
+
+      if (title === this.props.track?.title) {
+        title = undefined;
+      }
+      if (description === this.props.track?.description) {
+        description = undefined;
+      }
+      if (tags == this.props.track?.tags) {
+        tags = undefined;
+      }
+
+      const propsAttendeesList = this.props.track?.attendees?.map(
+        (attendee) => {
+          return { name: attendee.name };
+        }
+      );
+
+      if (
+        JSON.stringify(propsAttendeesList) === JSON.stringify(attendeesList)
+      ) {
+        attendeesList = undefined;
+      }
+
+      await this.props.updateTrack(
+        (id || 0)?.toString(),
+        title,
+        attendeesList,
+        description,
+        tags
+      );
+    } else {
+      await this.props.addTrack(
+        this.props.ohrwurm.tracks?.pacId,
+        title,
+        attendeesList,
+        audioFile,
+        createdAt,
+        description,
+        tags
+      );
+    }
+
+    this.setState({
+      loading: false,
+    });
+    this.props.toggle();
   };
 
   render() {
     return (
       <MDBModal isOpen={true} toggle={this.props.toggle} size="lg">
         <MDBModalBody>
+          {this.state.loading && (
+            <MDBProgress
+              material
+              value={100}
+              animated
+              height="25px"
+              color="success"
+              className="mb-0 pb-0"
+            >
+              Uploading file
+            </MDBProgress>
+          )}
           <MDBRow>
             <MDBCol>
               <MDBInput
@@ -154,7 +250,7 @@ class TrackModal extends React.Component<Props, State> {
                 group
                 type="text"
                 validate
-                value={this.state.trackName}
+                value={this.state.title}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setTrackName(e)
                 }
@@ -162,38 +258,52 @@ class TrackModal extends React.Component<Props, State> {
               <MDBInput
                 id="input"
                 className="input-track"
+                label="Description"
+                group
+                type="textarea"
+                validate
+                value={this.state.description}
+                onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                  this.setDescription(e)
+                }
+              />
+              <MDBInput
+                id="input"
+                disabled={this.state.editing}
+                className="input-track"
                 label="Date"
                 group
                 type="date"
                 validate
-                value={this.getDisplayDate(this.state.date)}
+                value={moment(this.state.createdAt).format("YYYY-MM-DD")}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setDate(e)
                 }
               />
-              <Dropzone onDrop={this.onDrop} accept="audio/*">
+              <Dropzone
+                onDrop={this.onDrop}
+                accept="audio/*"
+                disabled={this.state.editing}
+              >
                 {({ getRootProps, getInputProps, acceptedFiles }) => (
                   <div {...getRootProps()}>
                     <input {...getInputProps()} />
-                    {this.state.error.length > 0 || acceptedFiles.length > 0 ? (
+                    {this.state.error.length > 0 ||
+                    this.state.audioFile !== null ? (
                       <div className="text-center">
                         <ul className="list-group mt-2">
-                          {acceptedFiles.length > 0 &&
-                            acceptedFiles.map((acceptedFile, i) => (
-                              <li
-                                className="list-group-item list-group-item-success"
-                                key={i}
-                              >
-                                <MDBIcon
-                                  icon="cloud-upload-alt"
-                                  className="green-text"
-                                  size="3x"
-                                />
-                                <p className="lead mt-3 mb-0">
-                                  {acceptedFile.name}
-                                </p>
-                              </li>
-                            ))}
+                          <li className="list-group-item list-group-item-success">
+                            <MDBIcon
+                              icon="cloud-upload-alt"
+                              className="green-text"
+                              size="3x"
+                            />
+                            <p className="lead mt-3 mb-0">
+                              {this.state.audioFile
+                                ? this.state.audioFile.name
+                                : this.state.audioFileUrl}
+                            </p>
+                          </li>
                         </ul>
                         {this.state.loading && (
                           <MDBProgress
@@ -241,73 +351,33 @@ class TrackModal extends React.Component<Props, State> {
                 )}
               </Dropzone>
               <br />
-              <label>Attendees</label>
-              <TagInput
-                tags={this.state.attendees}
-                onTagsChanged={this.onAttendeesChanged}
-                wrapperStyle={`
-                    -webkit-transform: translate(0%,0%);
-                    -ms-transform: translate(0%,0%);
-                    position: unset;
-                    font-family: inherit;
-                    width: 100%;
-                    background: inherit;
-                    border-radius: 16px;
-                  `}
-                inputStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    padding: 5px;
-                    width: 25%;
-                    border-radius: 16px;
-                  `}
-                tagStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    border-radius: 16px;
-                  `}
-                tagDeleteStyle={`
-                    color: rgba(0,0,0,0.6);
-                  `}
-                placeholder="Attendee"
-              />
-              <br />
               <label>Tags</label>
-              <TagInput
-                tags={this.state.tags}
-                onTagsChanged={this.onTagsChanged}
-                wrapperStyle={`
-                    -webkit-transform: translate(0%,0%);
-                    -ms-transform: translate(0%,0%);
-                    position: unset;
-                    font-family: inherit;
-                    width: 100%;
-                    background: inherit;
-                    border-radius: 16px;
-                  `}
-                inputStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    padding: 5px;
-                    width: 25%;
-                    border-radius: 16px;
-                  `}
-                tagStyle={`
-                    background: #eceff1;
-                    color: rgba(0,0,0,0.6);
-                    border-radius: 16px;
-                  `}
-                tagDeleteStyle={`
-                    color: rgba(0,0,0,0.6);
-                  `}
-                placeholder="Tag"
-              />
+              <div className="tags">
+                <ReactTagInput
+                  tags={this.state.tags || []}
+                  onChange={(tags: Tags) => this.setState({ tags })}
+                  placeholder="Type and press enter"
+                  editable={true}
+                  readOnly={false}
+                />
+              </div>
+              <br />
+              <label>Attendees</label>
+              <div className="attendees">
+                <ReactTagInput
+                  tags={this.state.attendees || []}
+                  onChange={(attendees: Tags) => this.setState({ attendees })}
+                  placeholder="Type and press enter"
+                  editable={true}
+                  readOnly={false}
+                />
+              </div>
               <div className="text-center mb-4 mt-5">
                 <MDBBtn
                   color="light-green"
                   type="button"
                   className="btn-block z-depth-2 btn-primary"
-                  onClick={() => alert()}
+                  onClick={() => this.onSubmit()}
                 >
                   Save
                 </MDBBtn>

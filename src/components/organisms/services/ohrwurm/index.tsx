@@ -25,11 +25,14 @@ import Dropzone from "react-dropzone";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track } from "../../../../store/types";
+import { OhrwurmState, Track, TagType } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
   fetchPACTracksAction,
+  addTrackAction,
+  deleteTrackAction,
+  updateTrackAction,
 } from "../../../../store/actions/ohrwurmActions";
 //> Components
 import { Breadcrumbs } from "../../../atoms";
@@ -47,7 +50,7 @@ type TableType = "PROJECT" | "TRACK";
 interface State {
   activeTable: TableType;
   showTranscriptModal: boolean;
-  transcriptTitle: string;
+  transcriptTitle?: string;
   transcriptText: string;
   searchQuery?: string;
   selectedProjectIndex?: string;
@@ -56,7 +59,7 @@ interface State {
   trackModal: boolean;
   selectedTrack: Track | undefined;
   error: Array<any>;
-  files: any;
+  audioFile: any;
 }
 interface OwnProps {}
 interface StateProps {
@@ -66,6 +69,23 @@ interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
   fetchPACTracks: (pacId: string, searchQuery?: string) => void;
+  addTrack: (
+    pacId: string,
+    title: string,
+    attendees?: { name: string }[],
+    audioFile?: File,
+    createdAt?: Date,
+    description?: string,
+    tags?: TagType[]
+  ) => void;
+  deleteTrack: (id: string) => void;
+  updateTrack: (
+    id: string,
+    title?: string,
+    attendees?: { name: string }[],
+    description?: string,
+    tags?: TagType[]
+  ) => void;
 }
 interface Props
   extends OwnProps,
@@ -91,7 +111,7 @@ class Ohrwurm extends React.Component<Props, State> {
     trackModal: false,
     selectedTrack: undefined,
     error: [],
-    files: null,
+    audioFile: null,
   };
 
   componentDidMount = () => {
@@ -105,7 +125,6 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   selectProject = (index: string) => {
-    console.log(this.state.editingProject, "XXXXXXXXXXXXXXXXXXX");
     if (!this.state.editingProject) {
       this.props.fetchPACTracks(index);
       this.setState({ selectedProjectIndex: index, searchQuery: "" });
@@ -162,12 +181,12 @@ class Ohrwurm extends React.Component<Props, State> {
       trackModal: !this.state.trackModal,
     });
     if (this.state.trackModal) {
-      this.setState({ selectedTrack: undefined });
+      this.setState({ selectedTrack: undefined, audioFile: null });
     }
   };
 
-  deleteTrack = (track: Track) => {
-    console.log(track);
+  deleteTrack = async (track: Track) => {
+    await this.props.deleteTrack(track.id.toString());
   };
 
   editTrack = (track: Track) => {
@@ -180,7 +199,7 @@ class Ohrwurm extends React.Component<Props, State> {
   onDrop = async (files: any) => {
     if (files.length > 0) {
       this.setState({
-        files,
+        audioFile: files[0],
         error: [],
       });
 
@@ -256,7 +275,7 @@ class Ohrwurm extends React.Component<Props, State> {
             <MDBModalHeader toggle={this.toggleTranscriptModal}>
               <div className="row">
                 <span className="dark-grey-text font-medium ml-3">
-                  {truncate(this.state.transcriptTitle)}
+                  {truncate(this.state.transcriptTitle || "")}
                 </span>
               </div>
               <a className="dark-grey-text font-small font-weight-bold ml-1">
@@ -324,9 +343,11 @@ class Ohrwurm extends React.Component<Props, State> {
         )}
         {this.state.trackModal && (
           <TrackModal
-            files={this.state.files}
+            audioFile={this.state.audioFile}
             toggle={this.toggleTrackModal}
             track={this.state.selectedTrack}
+            addTrack={this.props.addTrack}
+            updateTrack={this.props.updateTrack}
           />
         )}
       </>
@@ -341,6 +362,9 @@ const mapStateToProps = (state: RootState) => ({ ohrwurm: state.ohrwurm });
 const mapDispatchToProps = {
   fetchPACS: fetchPACSAction,
   fetchPACTracks: fetchPACTracksAction,
+  addTrack: addTrackAction,
+  deleteTrack: deleteTrackAction,
+  updateTrack: updateTrackAction,
 };
 //#endregion
 

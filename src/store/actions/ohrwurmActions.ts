@@ -12,7 +12,14 @@ import { SnekClient } from "snek-client";
 
 //> Action Types
 import { RootState } from "../reducers/index";
-import { OhrwurmAction, Pagination, PAC, Track, Member } from "../types";
+import {
+  OhrwurmAction,
+  Pagination,
+  PAC,
+  Track,
+  TagType,
+  Member,
+} from "../types";
 //#endregion
 
 //#region > Queries
@@ -58,6 +65,21 @@ const trackQueryFragment = `
       name
     }
   }
+  transcript
+  pac {
+    ${pacQueryFragment}
+  }
+  audioFileUrl
+`;
+
+const trackAddFragment = `
+  id
+  title
+  createdAt
+  audioChannel
+  audioCodec
+  audioBitrate
+  description
   transcript
   pac {
     ${pacQueryFragment}
@@ -459,6 +481,277 @@ const fetchPACTracksAction = (
     }
   };
 };
+
+const addTrackAction = (
+  pacId: string,
+  title: string,
+  attendees?: { name: string }[],
+  audioFile?: File,
+  createdAt?: Date,
+  description?: string,
+  tags?: TagType[]
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation addTrack(
+          $token: String!
+          $pacId: ID!
+          $title: String!
+          $attendees: [AttendeeType]
+          $audioFile: Upload
+          $createdAt: DateTime
+          $description: String
+          $tags: [TagType]
+        ) {
+          addTrack(
+            token: $token
+            pacId: $pacId
+            title: $title
+            attendees: $attendees
+            audioFile: $audioFile
+            createdAt: $createdAt
+            description: $description
+            tags: $tags
+          ) {
+            track {
+              ${trackAddFragment}
+            }
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_ADD_TRACK_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        addTrack: {
+          track: Track;
+        };
+      }>("mutation", dataSheet, {
+        pacId,
+        title,
+        attendees,
+        audioFile,
+        createdAt,
+        description,
+        tags,
+      });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+      // add new track to current track items
+      let tracks = getState().ohrwurm.tracks;
+
+      if (!tracks) {
+        tracks = {
+          pacId: "0",
+          pagination: { total: 0, nextPage: 0 },
+          items: [],
+        };
+      }
+
+      if (data) {
+        const items = tracks.items?.concat({
+          id: data.addTrack.track.id,
+          title,
+          attendees,
+          audioFile,
+          createdAt,
+          description,
+          tags,
+          audioFileUrl: data.addTrack.track.audioFileUrl,
+          transcript: data.addTrack.track.transcript,
+          pac: data.addTrack.track.pac,
+        });
+
+        tracks.items = items;
+      }
+
+      dispatch({
+        type: "OHRWURM_ADD_TRACK_SUCCESS",
+        payload: {
+          tracks,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_ADD_TRACK_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Adding Track failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+
+const deleteTrackAction = (
+  id: string
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation deleteTrack($token: String, $id: ID!) {
+          deleteTrack(token: $token, id: $id) {
+            success
+          }
+        }
+      `;
+      dispatch({ type: "OHRWURM_DELETE_TRACK_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        deleteTrack: { success: string };
+      }>("mutation", dataSheet, { id });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new track to current track items
+      let tracks = getState().ohrwurm.tracks;
+
+      if (!tracks) {
+        tracks = {
+          pacId: "0",
+          pagination: { total: 0, nextPage: 0 },
+          items: [],
+        };
+      }
+
+      if (data) {
+        const items = tracks.items?.filter((elem) => elem.id.toString() !== id);
+
+        tracks.items = items;
+      }
+
+      dispatch({
+        type: "OHRWURM_DELETE_TRACK_SUCCESS",
+        payload: {
+          tracks,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_DELETE_TRACK_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Deleting Track failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
+
+const updateTrackAction = (
+  id: string,
+  title?: string,
+  attendees?: { name: string }[],
+  description?: string,
+  tags?: TagType[]
+): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
+  return async (
+    dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
+    getState,
+    { getClientSnek }
+  ) => {
+    try {
+      const dataSheet = gql`
+        mutation updateTrack(
+          $token: String!
+          $id: ID!
+          $title: String
+          $attendees: [AttendeeType]
+          $description: String
+          $tags: [TagType]
+        ) {
+          updateTrack(
+            token: $token
+            id: $id
+            title: $title
+            attendees: $attendees
+            description: $description
+            tags: $tags
+          ) {
+            track {
+              ${trackAddFragment}
+            }
+          }
+        }
+      `;
+
+      dispatch({ type: "OHRWURM_UPDATE_TRACK_REQUEST" });
+
+      const { data, errors } = await getClientSnek().session.runner<{
+        updateTrack: {
+          track: Track;
+        };
+      }>("mutation", dataSheet, { id, title, attendees, description, tags });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      // add new track to current track items
+      let tracks = getState().ohrwurm.tracks;
+      if (tracks?.items && data) {
+        const index = tracks.items?.findIndex(
+          (item) => item.id.toString() === id
+        );
+
+        const items = [
+          ...tracks.items.slice(0, index),
+          {
+            id: data.updateTrack.track.id,
+            title: title || tracks.items[index].title,
+            attendees: attendees || tracks.items[index].attendees,
+            audioFile: tracks.items[index].audioFile,
+            createAt: tracks.items[index].createdAt,
+            description: description || tracks.items[index].description,
+            tags: tags || tracks.items[index].tags,
+            audioFileUrl: tracks.items[index].audioFileUrl,
+            transcript: tracks.items[index].transcript,
+            pac: tracks.items[index].pac,
+          },
+          ...tracks.items.slice(index + 1),
+        ];
+
+        tracks.items = [...items];
+      }
+
+      dispatch({
+        type: "OHRWURM_UPDATE_TRACK_SUCCESS",
+        payload: {
+          tracks,
+        },
+      });
+    } catch (ex) {
+      dispatch({
+        type: "OHRWURM_UPDATE_TRACK_FAILURE",
+        payload: {
+          error: {
+            errorCode: 999,
+            message: `Updating Member failed (${ex.message})`,
+          },
+          errorDetails: ex,
+        },
+      });
+    }
+  };
+};
 //#endregion
 
 //#region > Ohrwurm Member Actions
@@ -731,6 +1024,9 @@ const updateMemberAction = (
 export {
   fetchPACSAction,
   fetchPACTracksAction,
+  addTrackAction,
+  deleteTrackAction,
+  updateTrackAction,
   addPACAction,
   deletePACAction,
   updatePACAction,

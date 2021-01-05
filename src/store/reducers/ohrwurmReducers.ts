@@ -46,13 +46,22 @@ const ohrwurmReducer = (
       };
     //> Get Tracks
     case "OHRWURM_FETCH_TRACKS_REQUEST":
+    case "OHRWURM_ADD_TRACK_REQUEST":
+    case "OHRWURM_DELETE_TRACK_REQUEST":
+    case "OHRWURM_UPDATE_TRACK_REQUEST":
       return state;
     case "OHRWURM_FETCH_TRACKS_SUCCESS":
+    case "OHRWURM_ADD_TRACK_SUCCESS":
+    case "OHRWURM_DELETE_TRACK_SUCCESS":
+    case "OHRWURM_UPDATE_TRACK_SUCCESS":
       return {
         ...state,
         tracks: payload?.tracks,
       };
     case "OHRWURM_FETCH_TRACKS_FAILURE":
+    case "OHRWURM_ADD_TRACK_FAILURE":
+    case "OHRWURM_DELETE_TRACK_FAILURE":
+    case "OHRWURM_UPDATE_TRACK_FAILURE":
       return {
         ...INIT_STATE,
         error: payload?.error,
