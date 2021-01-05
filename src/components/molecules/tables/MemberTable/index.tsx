@@ -52,7 +52,7 @@ class MemberTable extends React.Component<
       },
       {
         name: "Supervisor",
-        selector: "isOhrwurmSupervisor",
+        cell: (e: any) => e.isOhrwurmSupervisor && <MDBIcon icon="check" />,
       },
       {
         name: undefined,
