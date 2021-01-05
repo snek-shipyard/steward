@@ -23,10 +23,7 @@ import { connect } from "react-redux";
 import { RootState } from "../../../../store/reducers/index";
 import { OhrwurmState, Track, Member } from "../../../../store/types";
 //> Store Actions
-import {
-  fetchPACSAction,
-  fetchPACTracksAction,
-} from "../../../../store/actions/ohrwurmActions";
+import { fetchPACSAction } from "../../../../store/actions/ohrwurmActions";
 //> Style Sheet
 import "./membermodal.scss";
 //#endregion
@@ -47,9 +44,7 @@ interface StateProps {
   username: string;
 }
 interface DispatchProps {
-  // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
-  fetchPACTracks: (pacId: string, searchQuery?: string) => void;
 }
 interface Props
   extends OwnProps,
@@ -73,16 +68,20 @@ class MemberModal extends React.Component<Props, State> {
   };
 
   componentWillMount = () => {
+    this.props.fetchPACS();
+
     if (this.props.username) {
-      (this.props.ohrwurm.members?.items || []).map((member: Member) => {
-        if (member.username == this.props.username) {
-          this.setState({
-            username: member.username,
-            isOhrwurmSupervisor: member.isOhrwurmSupervisor,
-            editing: true,
-          });
-        }
-      });
+      const member = this.props.ohrwurm.members?.items?.find(
+        (member) => member.username === this.props.username
+      );
+
+      if (member) {
+        this.setState({
+          username: member.username,
+          isOhrwurmSupervisor: member.isOhrwurmSupervisor,
+          editing: true,
+        });
+      }
     }
   };
 
@@ -96,6 +95,7 @@ class MemberModal extends React.Component<Props, State> {
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
+    this.props.fetchPACS(value);
 
     // Add search for users
   };
@@ -130,6 +130,7 @@ class MemberModal extends React.Component<Props, State> {
                 group
                 type="text"
                 validate
+                disabled={this.state.editing}
                 value={this.state.username}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setUsername(e)
@@ -157,37 +158,22 @@ class MemberModal extends React.Component<Props, State> {
                   />
                 </div>
                 <MDBListGroup>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox1"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox3"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox2"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput type="checkbox" id="checkbox4" label="Hugo" />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox5"
-                      label="TESTTSTST"
-                    />
-                  </MDBListGroupItem>
+                  {(this.props.ohrwurm?.pacs?.items || []).map((pac, id) => {
+                    return (
+                      <MDBListGroupItem>
+                        <MDBInput
+                          type="checkbox"
+                          id={id.toString()}
+                          label={pac.title}
+                          value={pac.title}
+                          // checked={this.checkChecked(pac.title)}
+                          // onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                          //   this.setMembers(e)
+                          // }
+                        />
+                      </MDBListGroupItem>
+                    );
+                  })}
                 </MDBListGroup>
               </div>
               <div className="text-right mb-4 mt-5">
@@ -215,7 +201,6 @@ const mapStateToProps = (state: RootState) => ({ ohrwurm: state.ohrwurm });
 
 const mapDispatchToProps = {
   fetchPACS: fetchPACSAction,
-  fetchPACTracks: fetchPACTracksAction,
 };
 //#endregion
 
