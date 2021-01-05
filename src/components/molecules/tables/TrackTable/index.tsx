@@ -144,7 +144,9 @@ class TrackTable extends React.Component<
                 >
                   {"View"}
                 </MDBDropdownItem>
-                <MDBDropdownItem disabled>Download </MDBDropdownItem>
+                <MDBDropdownItem href={e.audioFileUrl} download>
+                  Download
+                </MDBDropdownItem>
                 <MDBDropdownItem
                   divider
                   hidden={this.props.modify ? false : true}
