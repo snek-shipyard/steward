@@ -118,65 +118,115 @@ $reactTagMarginPadding: 0.1875em;
   }
 }
 
-.tag-input-color-selector {
-  @import url(https://fonts.googleapis.com/css?family=Lato:400,300);
+.tags {
+  .tag-input-color-selector {
+    @import url(https://fonts.googleapis.com/css?family=Lato:400,300);
 
-  $colors: (
-    Light: #e1e1e1,
-    Success: #00b74a,
-    Danger: #f93154,
-    Warning: #ffa900,
-    Info: #39c0ed,
-    Dark: #252525,
-  );
+    $colors: (
+      Light: #e1e1e1,
+      Success: #00b74a,
+      Danger: #f93154,
+      Warning: #ffa900,
+      Info: #39c0ed,
+      Dark: #252525,
+    );
 
-  * {
-    box-sizing: border-box;
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  body {
-    position: absolute;
-    top: 35%;
-    left: 35%;
-    transform: translate(-35%, -35%);
-    font-family: "lato";
-    color: #333;
-  }
+    body {
+      position: absolute;
+      top: 35%;
+      left: 35%;
+      transform: translate(-35%, -35%);
+      font-family: "lato";
+      color: #333;
+    }
 
-  input[type="radio"] {
-    display: none;
-    &:checked + label {
-      span {
-        transform: scale(1.25);
-      }
-      @each $name, $value in $colors {
-        .#{$name} {
-          border: 2px solid darken($value, 20%);
+    input[type="radio"] {
+      display: none;
+      &:checked + label {
+        span {
+          transform: scale(1.25);
         }
-      } // !@each
-    } // !&:checked + label
-  }
+        @each $name, $value in $colors {
+          .#{$name} {
+            border: 2px solid darken($value, 20%);
+          }
+        } // !@each
+      } // !&:checked + label
+    }
 
-  label {
-    display: inline-block;
-    width: 25px;
-    height: 25px;
-    margin-right: 10px;
-    cursor: pointer;
-    &:hover {
+    label {
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      margin-right: 10px;
+      cursor: pointer;
+      &:hover {
+        span {
+          transform: scale(1.25);
+        }
+      }
       span {
-        transform: scale(1.25);
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        transition: transform 0.2s ease-in-out;
+        @each $name, $value in $colors {
+          &.#{$name} {
+            background: $value;
+          }
+        }
       }
     }
-    span {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      transition: transform 0.2s ease-in-out;
-      @each $name, $value in $colors {
-        &.#{$name} {
-          background: $value;
+  }
+}
+
+.attendees {
+  .tag-input-color-selector {
+    @import url(https://fonts.googleapis.com/css?family=Lato:400,300);
+
+    $colors: (
+      Light: #e1e1e1,
+    );
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      position: absolute;
+      top: 35%;
+      left: 35%;
+      transform: translate(-35%, -35%);
+      font-family: "lato";
+      color: #333;
+    }
+
+    label {
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      margin-right: 10px;
+      cursor: pointer;
+      &:hover {
+        span {
+          transform: scale(1.25);
+        }
+      }
+      span {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        transition: transform 0.2s ease-in-out;
+        @each $name, $value in $colors {
+          &.#{$name} {
+            background: $value;
+          }
         }
       }
     }

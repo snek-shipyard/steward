@@ -352,7 +352,7 @@ class TrackModal extends React.Component<Props, State> {
               </Dropzone>
               <br />
               <label>Tags</label>
-              <span id="tags">
+              <div className="tags">
                 <ReactTagInput
                   tags={this.state.tags || []}
                   onChange={(tags: Tags) => this.setState({ tags })}
@@ -360,10 +360,10 @@ class TrackModal extends React.Component<Props, State> {
                   editable={true}
                   readOnly={false}
                 />
-              </span>
+              </div>
               <br />
               <label>Attendees</label>
-              <span id="attendees">
+              <div className="attendees">
                 <ReactTagInput
                   tags={this.state.attendees || []}
                   onChange={(attendees: Tags) => this.setState({ attendees })}
@@ -371,7 +371,7 @@ class TrackModal extends React.Component<Props, State> {
                   editable={true}
                   readOnly={false}
                 />
-              </span>
+              </div>
               <div className="text-center mb-4 mt-5">
                 <MDBBtn
                   color="light-green"
