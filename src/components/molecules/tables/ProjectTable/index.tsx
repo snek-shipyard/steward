@@ -62,10 +62,10 @@ class ProjectTable extends React.Component<
         cell: (e: any) => (
           <MDBBtnGroup hidden={this.props.modify ? false : true}>
             <MDBDropdown>
-              <MDBDropdownToggle color="blue">
+              <MDBDropdownToggle color="white">
                 <MDBIcon icon="ellipsis-v" />
               </MDBDropdownToggle>
-              <MDBDropdownMenu color="danger">
+              <MDBDropdownMenu color="special">
                 <MDBDropdownItem onClick={() => this.props.onEditClick(e.id)}>
                   {"Edit"}
                 </MDBDropdownItem>
