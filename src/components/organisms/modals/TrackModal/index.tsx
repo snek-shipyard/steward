@@ -159,6 +159,7 @@ class TrackModal extends React.Component<Props, State> {
 
   onSubmit = async () => {
     this.setState({ loading: true });
+
     let {
       title,
       attendees,
@@ -175,25 +176,27 @@ class TrackModal extends React.Component<Props, State> {
     );
 
     if (this.state.editing) {
-      let id = this.props.track?.id;
+      const id = this.props.track?.id;
 
-      if (title == this.props.track?.title) {
+      if (title === this.props.track?.title) {
         title = undefined;
       }
-      if (description == this.props.track?.description) {
+      if (description === this.props.track?.description) {
         description = undefined;
       }
       if (tags == this.props.track?.tags) {
         tags = undefined;
       }
 
-      let propsAttendeesList = (this.props.track?.attendees || []).map(
+      const propsAttendeesList = this.props.track?.attendees?.map(
         (attendee) => {
           return { name: attendee.name };
         }
       );
 
-      if (attendeesList == propsAttendeesList) {
+      if (
+        JSON.stringify(propsAttendeesList) === JSON.stringify(attendeesList)
+      ) {
         attendeesList = undefined;
       }
 
