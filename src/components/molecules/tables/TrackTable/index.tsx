@@ -142,7 +142,7 @@ class TrackTable extends React.Component<
                   hidden={this.props.modify ? false : true}
                   onClick={() => this.props.onEditClick(e)}
                 >
-                  {"View"}
+                  {"Edit"}
                 </MDBDropdownItem>
                 <MDBDropdownItem href={e.audioFileUrl} download>
                   Download

@@ -65,7 +65,7 @@ class MemberTable extends React.Component<
               </MDBDropdownToggle>
               <MDBDropdownMenu color="danger">
                 <MDBDropdownItem onClick={() => this.props.onEditClick(e.id)}>
-                  {"View"}
+                  {"Edit"}
                 </MDBDropdownItem>
                 <MDBDropdownItem divider />
                 <MDBDropdownItem onClick={() => this.props.onDeleteClick(e.id)}>
