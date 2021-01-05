@@ -33,6 +33,10 @@ import {
   addTrackAction,
   deleteTrackAction,
   updateTrackAction,
+  addPACAction,
+  deletePACAction,
+  updatePACAction,
+  fetchMembersAction,
 } from "../../../../store/actions/ohrwurmActions";
 //> Components
 import { Breadcrumbs } from "../../../atoms";
@@ -69,6 +73,7 @@ interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
   fetchPACTracks: (pacId: string, searchQuery?: string) => void;
+  fetchMember: () => void;
   addTrack: (
     pacId: string,
     title: string,
@@ -85,6 +90,20 @@ interface DispatchProps {
     attendees?: { name: string }[],
     description?: string,
     tags?: TagType[]
+  ) => void;
+  addPAC: (
+    title: string,
+    description?: string,
+    channelId?: string,
+    members?: string[]
+  ) => void;
+  deletePAC: (id: string) => void;
+  updatePAC: (
+    id: string,
+    title?: string,
+    description?: string,
+    channelId?: string,
+    members?: string[]
   ) => void;
 }
 interface Props
@@ -115,12 +134,11 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   componentDidMount = () => {
-    console.log("MOUNT");
     this.props.fetchPACS();
+    this.props.fetchMember();
   };
 
   switchTable = (table: TableType) => {
-    console.log(table);
     this.setState({ activeTable: table });
   };
 
@@ -134,14 +152,16 @@ class Ohrwurm extends React.Component<Props, State> {
     }
   };
 
-  deleteProject = (index: string) => {
-    this.setState({ selectedProjectIndex: index });
+  deleteProject = async (index: string) => {
     this.state.editingProject = true;
+    await this.props.deletePAC(index);
+    this.state.editingProject = false;
   };
 
   editProject = (index: string) => {
     this.setState({ selectedProjectIndex: index });
     this.state.editingProject = true;
+    this.toggleProjectModal();
   };
 
   selectTrack = (track: Track) => {
@@ -170,10 +190,13 @@ class Ohrwurm extends React.Component<Props, State> {
     }
   };
 
-  toggleProjectModal = () => {
+  toggleProjectModal = async () => {
     this.setState({
       projectModal: !this.state.projectModal,
     });
+    if (this.state.projectModal) {
+      this.setState({ selectedProjectIndex: "" });
+    }
   };
 
   toggleTrackModal = () => {
@@ -186,7 +209,7 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   deleteTrack = async (track: Track) => {
-    await this.props.deleteTrack(track.id.toString());
+    await this.props.deleteTrack(track.id);
   };
 
   editTrack = (track: Track) => {
@@ -339,7 +362,12 @@ class Ohrwurm extends React.Component<Props, State> {
           </>
         )}
         {this.state.projectModal && (
-          <ProjectModal toggle={this.toggleProjectModal} />
+          <ProjectModal
+            toggle={this.toggleProjectModal}
+            selectedProjectIndex={this.state.selectedProjectIndex}
+            addTrack={this.props.addPAC}
+            updateTrack={this.props.updatePAC}
+          />
         )}
         {this.state.trackModal && (
           <TrackModal
@@ -365,6 +393,10 @@ const mapDispatchToProps = {
   addTrack: addTrackAction,
   deleteTrack: deleteTrackAction,
   updateTrack: updateTrackAction,
+  addPAC: addPACAction,
+  deletePAC: deletePACAction,
+  updatePAC: updatePACAction,
+  fetchMember: fetchMembersAction,
 };
 //#endregion
 

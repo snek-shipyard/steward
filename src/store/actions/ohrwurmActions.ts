@@ -224,13 +224,15 @@ const addPACAction = (
       }
 
       if (data) {
-        pacs?.items.push({
+        const items = pacs.items.concat({
           id: data.addPac.pac.id,
           title,
           description,
           channelId,
           members: data.addPac.pac.members,
         });
+
+        pacs.items = items;
       }
 
       dispatch({

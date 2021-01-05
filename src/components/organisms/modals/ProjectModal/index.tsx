@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track } from "../../../../store/types";
+import { OhrwurmState, Track, PAC } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
@@ -33,14 +33,20 @@ import "./projectmodal.scss";
 
 //#region > Interfaces
 interface State {
-  projectName: string;
-  description: string;
+  title: string;
+  description?: string;
+  channelId?: string;
+  members?: string[];
   searchQuery?: string;
+  editing: boolean;
 }
 interface OwnProps {}
 interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
+  selectedProjectIndex?: string;
+  addTrack: any;
+  updateTrack: any;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -62,23 +68,78 @@ const truncate = (input: string) =>
 //#region > Components
 class ProjectModal extends React.Component<Props, State> {
   state: State = {
-    projectName: "Test project name",
-    description: "This is a description for a project!!!",
+    title: "",
+    description: "",
+    channelId: "",
+    members: [],
     searchQuery: "",
+    editing: false,
+  };
+
+  componentWillMount = () => {
+    if (this.props.selectedProjectIndex) {
+      this.props.ohrwurm.pacs?.items.map((pac: PAC) => {
+        if (pac.id == this.props.selectedProjectIndex) {
+          this.setState({
+            title: pac?.title || "",
+            description: pac?.description,
+            channelId: pac?.channelId,
+            members: pac?.members?.map((member) => {
+              return member.username;
+            }),
+          });
+        }
+      });
+    }
   };
 
   setProjectName = (e: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({ projectName: e.currentTarget.value });
+    this.setState({ title: e.currentTarget.value });
+  };
+
+  setChannelId = (e: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({ channelId: e.currentTarget.value });
   };
 
   setDescription = (e: React.FormEvent<HTMLInputElement>): void => {
     this.setState({ description: e.currentTarget.value });
   };
 
+  setMembers = (e: React.FormEvent<HTMLInputElement>): void => {
+    let { members } = this.state;
+    let member = e.currentTarget.value;
+
+    if ((members || []).includes(member)) {
+      members = members?.filter((f) => f !== member);
+    } else {
+      members?.push(member);
+    }
+
+    this.setState({ members });
+  };
+
   search = (value: string) => {
     this.setState({ searchQuery: value });
 
     // Add search for users
+  };
+
+  onSubmit = async () => {
+    let { title, description, channelId, members } = this.state;
+    if (this.state.editing) {
+      await this.props.updateTrack();
+    } else {
+      await this.props.addTrack(title, description, channelId, members);
+    }
+
+    this.props.toggle();
+  };
+
+  checkChecked = (username: string) => {
+    if (this.state.members?.includes(username)) {
+      return true;
+    }
+    return false;
   };
 
   render() {
@@ -99,9 +160,21 @@ class ProjectModal extends React.Component<Props, State> {
                 group
                 type="text"
                 validate
-                value={this.state.projectName}
+                value={this.state.title}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setProjectName(e)
+                }
+              />
+              <MDBInput
+                id="input"
+                className="input-track"
+                label="Channel ID"
+                group
+                type="text"
+                validate
+                value={this.state.channelId}
+                onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                  this.setChannelId(e)
                 }
               />
               <MDBInput
@@ -129,37 +202,24 @@ class ProjectModal extends React.Component<Props, State> {
                   />
                 </div>
                 <MDBListGroup>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox1"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox3"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox2"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput type="checkbox" id="checkbox4" label="Hugo" />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox5"
-                      label="TESTTSTST"
-                    />
-                  </MDBListGroupItem>
+                  {(this.props.ohrwurm?.members?.items || []).map(
+                    (member, id) => {
+                      return (
+                        <MDBListGroupItem>
+                          <MDBInput
+                            type="checkbox"
+                            id={id.toString()}
+                            label={member.username}
+                            value={member.username}
+                            checked={this.checkChecked(member.username)}
+                            onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                              this.setMembers(e)
+                            }
+                          />
+                        </MDBListGroupItem>
+                      );
+                    }
+                  )}
                 </MDBListGroup>
               </div>
               <div className="text-right mb-4 mt-5">
@@ -168,7 +228,7 @@ class ProjectModal extends React.Component<Props, State> {
                   color="light-green"
                   type="button"
                   className="z-depth-2 btn-primary"
-                  onClick={() => alert()}
+                  onClick={() => this.onSubmit()}
                 >
                   Save
                 </MDBBtn>
