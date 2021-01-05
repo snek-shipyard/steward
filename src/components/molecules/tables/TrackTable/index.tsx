@@ -53,7 +53,7 @@ class TrackTable extends React.Component<
             {tags?.map((tag) => (
               <MDBBadge
                 pill
-                color={tag.significance ? tag.significance : "light"}
+                color={tag.significance ? tag.significance : "LIGHT"}
                 className="m-1 shadow-none"
               >
                 <p className="mx-2 my-2">{tag.name}</p>

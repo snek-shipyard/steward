@@ -26,7 +26,12 @@ import moment from "moment";
 import ReactTagInput from "@snek-shipyard/react-tag-input";
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track, TagType } from "../../../../store/types";
+import {
+  OhrwurmState,
+  Track,
+  TagType,
+  Significance,
+} from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
@@ -104,14 +109,20 @@ class TrackModal extends React.Component<Props, State> {
         createdAt,
         audioFile,
         description,
+        attendees,
         audioFileUrl,
       } = track;
 
       this.setState({
-        attendees: (track.attendees || []).map((attendee) => {
+        attendees: (attendees || []).map((attendee) => {
           return { name: attendee.name, significance: "LIGHT" };
         }),
-        tags,
+        tags: (tags || []).map((tag) => {
+          return {
+            name: tag.name,
+            significance: tag.significance.toUpperCase() as Significance,
+          };
+        }),
         title,
         description,
         createdAt,
@@ -157,9 +168,9 @@ class TrackModal extends React.Component<Props, State> {
       tags,
     } = this.state;
 
-    let attendeesList: string[] | undefined = (attendees || []).map(
+    let attendeesList: { name: string }[] | undefined = (attendees || []).map(
       (attendee) => {
-        return attendee.name;
+        return { name: attendee.name };
       }
     );
 
@@ -172,21 +183,27 @@ class TrackModal extends React.Component<Props, State> {
       if (description == this.props.track?.description) {
         description = undefined;
       }
-      if (tags != this.props.track?.tags) {
+      if (tags == this.props.track?.tags) {
         tags = undefined;
       }
 
       let propsAttendeesList = (this.props.track?.attendees || []).map(
         (attendee) => {
-          return attendee.name;
+          return { name: attendee.name };
         }
       );
 
-      if (attendeesList != propsAttendeesList) {
+      if (attendeesList == propsAttendeesList) {
         attendeesList = undefined;
       }
 
-      await this.props.updateTrack(id, title, description, tags, attendeesList);
+      await this.props.updateTrack(
+        (id || 0)?.toString(),
+        title,
+        attendeesList,
+        description,
+        tags
+      );
     } else {
       await this.props.addTrack(
         this.props.ohrwurm.tracks?.pacId,
@@ -199,7 +216,9 @@ class TrackModal extends React.Component<Props, State> {
       );
     }
 
-    this.setState({ loading: false });
+    this.setState({
+      loading: false,
+    });
     this.props.toggle();
   };
 

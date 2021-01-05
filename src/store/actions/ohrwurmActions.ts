@@ -468,7 +468,18 @@ const updateTrackAction = (
 
         const items = [
           ...tracks.items.slice(0, index),
-          data.updateTrack.track,
+          {
+            id: data.updateTrack.track.id,
+            title: title || tracks.items[index].title,
+            attendees: attendees || tracks.items[index].attendees,
+            audioFile: tracks.items[index].audioFile,
+            createAt: tracks.items[index].createdAt,
+            description: description || tracks.items[index].description,
+            tags: tags || tracks.items[index].tags,
+            audioFileUrl: tracks.items[index].audioFileUrl,
+            transcript: tracks.items[index].transcript,
+            pac: tracks.items[index].pac,
+          },
           ...tracks.items.slice(index + 1),
         ];
 
