@@ -20,9 +20,9 @@ import {
 import { connect } from "react-redux";
 // Contains the functionality for uploading a file
 import Dropzone from "react-dropzone";
+// Contains functionality to display time
+import moment from "moment";
 // Contains the functionality for tag inputs
-import { TagInput } from "reactjs-tag-input";
-//import { Tag } from "react-tag-input";
 import ReactTagInput from "@snek-shipyard/react-tag-input";
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
@@ -51,6 +51,8 @@ interface State {
   description?: string;
   createdAt?: Date;
   audioFile?: any;
+  audioFileUrl?: string;
+  editing: boolean;
 }
 interface OwnProps {}
 interface StateProps {
@@ -58,6 +60,7 @@ interface StateProps {
   toggle: any;
   track: Track | undefined;
   addTrack: any;
+  updateTrack: any;
   audioFile: any;
 }
 interface DispatchProps {
@@ -88,12 +91,21 @@ class TrackModal extends React.Component<Props, State> {
     description: "",
     createdAt: new Date(),
     audioFile: null,
+    audioFileUrl: "",
+    editing: false,
   };
 
   componentWillMount = () => {
     if (this.props.track) {
       const track = this.props.track;
-      const { tags, title, createdAt, audioFile, description } = track;
+      const {
+        tags,
+        title,
+        createdAt,
+        audioFile,
+        description,
+        audioFileUrl,
+      } = track;
 
       this.setState({
         attendees: (track.attendees || []).map((attendee) => {
@@ -104,6 +116,8 @@ class TrackModal extends React.Component<Props, State> {
         description,
         createdAt,
         audioFile,
+        audioFileUrl,
+        editing: true,
       });
     }
 
@@ -126,21 +140,6 @@ class TrackModal extends React.Component<Props, State> {
     this.setState({ createdAt: new Date(e.currentTarget.value) });
   };
 
-  getDisplayDate = (date: Date) => {
-    let dateString: string = "";
-    date
-      .toLocaleDateString()
-      .split("/")
-      .reverse()
-      .map((part: string) => {
-        if (part.length < 2) {
-          part = "0" + part;
-        }
-        dateString += part + "-";
-      });
-    return dateString.slice(0, -1);
-  };
-
   onDrop = async (files: any) => {
     let audioFile = files[0];
 
@@ -158,17 +157,47 @@ class TrackModal extends React.Component<Props, State> {
       tags,
     } = this.state;
 
-    let res = await this.props.addTrack(
-      this.props.ohrwurm.tracks?.pacId,
-      title,
-      (attendees || []).map((attendee) => {
+    let attendeesList: string[] | undefined = (attendees || []).map(
+      (attendee) => {
         return attendee.name;
-      }),
-      audioFile,
-      createdAt,
-      description,
-      tags
+      }
     );
+
+    if (this.state.editing) {
+      let id = this.props.track?.id;
+
+      if (title == this.props.track?.title) {
+        title = undefined;
+      }
+      if (description == this.props.track?.description) {
+        description = undefined;
+      }
+      if (tags != this.props.track?.tags) {
+        tags = undefined;
+      }
+
+      let propsAttendeesList = (this.props.track?.attendees || []).map(
+        (attendee) => {
+          return attendee.name;
+        }
+      );
+
+      if (attendeesList != propsAttendeesList) {
+        attendeesList = undefined;
+      }
+
+      await this.props.updateTrack(id, title, description, tags, attendeesList);
+    } else {
+      await this.props.addTrack(
+        this.props.ohrwurm.tracks?.pacId,
+        title,
+        attendeesList,
+        audioFile,
+        createdAt,
+        description,
+        tags
+      );
+    }
 
     this.setState({ loading: false });
     this.props.toggle();
@@ -218,39 +247,41 @@ class TrackModal extends React.Component<Props, State> {
               />
               <MDBInput
                 id="input"
+                disabled={this.state.editing}
                 className="input-track"
                 label="Date"
                 group
                 type="date"
                 validate
-                value={this.getDisplayDate(this.state.createdAt || new Date())}
+                value={moment(this.state.createdAt).format("YYYY-MM-DD")}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
                   this.setDate(e)
                 }
               />
-              <Dropzone onDrop={this.onDrop} accept="audio/*">
+              <Dropzone
+                onDrop={this.onDrop}
+                accept="audio/*"
+                disabled={this.state.editing}
+              >
                 {({ getRootProps, getInputProps, acceptedFiles }) => (
                   <div {...getRootProps()}>
                     <input {...getInputProps()} />
-                    {this.state.error.length > 0 || acceptedFiles.length > 0 ? (
+                    {this.state.error.length > 0 ||
+                    this.state.audioFile !== null ? (
                       <div className="text-center">
                         <ul className="list-group mt-2">
-                          {acceptedFiles.length > 0 &&
-                            acceptedFiles.map((acceptedFile, i) => (
-                              <li
-                                className="list-group-item list-group-item-success"
-                                key={i}
-                              >
-                                <MDBIcon
-                                  icon="cloud-upload-alt"
-                                  className="green-text"
-                                  size="3x"
-                                />
-                                <p className="lead mt-3 mb-0">
-                                  {acceptedFile.name}
-                                </p>
-                              </li>
-                            ))}
+                          <li className="list-group-item list-group-item-success">
+                            <MDBIcon
+                              icon="cloud-upload-alt"
+                              className="green-text"
+                              size="3x"
+                            />
+                            <p className="lead mt-3 mb-0">
+                              {this.state.audioFile
+                                ? this.state.audioFile.name
+                                : this.state.audioFileUrl}
+                            </p>
+                          </li>
                         </ul>
                         {this.state.loading && (
                           <MDBProgress
@@ -298,22 +329,22 @@ class TrackModal extends React.Component<Props, State> {
                 )}
               </Dropzone>
               <br />
-              <label>Attendees</label>
-              <span id="attendees">
+              <label>Tags</label>
+              <span id="tags">
                 <ReactTagInput
-                  tags={this.state.attendees || []}
-                  onChange={(attendees: Tags) => this.setState({ attendees })}
+                  tags={this.state.tags || []}
+                  onChange={(tags: Tags) => this.setState({ tags })}
                   placeholder="Type and press enter"
                   editable={true}
                   readOnly={false}
                 />
               </span>
               <br />
-              <label>Tags</label>
-              <span id="tags">
+              <label>Attendees</label>
+              <span id="attendees">
                 <ReactTagInput
-                  tags={this.state.tags || []}
-                  onChange={(tags: Tags) => this.setState({ tags })}
+                  tags={this.state.attendees || []}
+                  onChange={(attendees: Tags) => this.setState({ attendees })}
                   placeholder="Type and press enter"
                   editable={true}
                   readOnly={false}

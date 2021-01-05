@@ -384,9 +384,9 @@ const deleteTrackAction = (
       }
 
       if (data) {
-        tracks.items = tracks.items?.filter(
-          (elem) => elem.id.toString() !== id
-        );
+        const items = tracks.items?.filter((elem) => elem.id.toString() !== id);
+
+        tracks.items = items;
       }
 
       dispatch({
@@ -413,7 +413,7 @@ const deleteTrackAction = (
 const updateTrackAction = (
   id: string,
   title?: string,
-  attendees?: string[],
+  attendees?: { name: string }[],
   description?: string,
   tags?: TagType[]
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
@@ -432,7 +432,7 @@ const updateTrackAction = (
           $description: String
           $tags: [TagType]
         ) {
-          updateOhrwurmMember(
+          updateTrack(
             token: $token
             id: $id
             title: $title
@@ -440,7 +440,7 @@ const updateTrackAction = (
             description: $description
             tags: $tags
           ) {
-            member {
+            track {
               ${trackAddFragment}
             }
           }

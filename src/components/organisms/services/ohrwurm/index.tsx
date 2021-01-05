@@ -79,6 +79,13 @@ interface DispatchProps {
     tags?: TagType[]
   ) => void;
   deleteTrack: (id: string) => void;
+  updateTrack: (
+    id: string,
+    title?: string,
+    attendees?: { name: string }[],
+    description?: string,
+    tags?: TagType[]
+  ) => void;
 }
 interface Props
   extends OwnProps,
@@ -175,7 +182,7 @@ class Ohrwurm extends React.Component<Props, State> {
       trackModal: !this.state.trackModal,
     });
     if (this.state.trackModal) {
-      this.setState({ selectedTrack: undefined });
+      this.setState({ selectedTrack: undefined, audioFile: null });
     }
   };
 
@@ -341,6 +348,7 @@ class Ohrwurm extends React.Component<Props, State> {
             toggle={this.toggleTrackModal}
             track={this.state.selectedTrack}
             addTrack={this.props.addTrack}
+            updateTrack={this.props.updateTrack}
           />
         )}
       </>
