@@ -119,7 +119,7 @@ class MemberPage extends React.Component<Props, State> {
             </MDBCol>
           </MDBRow>
           <MemberTable
-            members={[]}
+            entries={[]}
             onDeleteClick={() => this.deleteUser()}
             onEditClick={() => this.editUser()}
           ></MemberTable>

@@ -4,46 +4,40 @@
 import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
-import { MDBDataTableV5, MDBRow, MDBCol, MDBIcon } from "mdbreact";
+import {
+  MDBBtn,
+  MDBInput,
+  MDBIcon,
+  MDBDropdown,
+  MDBDropdownMenu,
+  MDBDropdownToggle,
+  MDBDropdownItem,
+  MDBBtnGroup,
+} from "mdbreact";
+//> Data Table
+import DataTable from "react-data-table-component";
 
 //> Store Types
-import { PAC } from "../../../../store/types";
+import { Member } from "../../../../store/types";
 //#endregion
 
 //#region > Components
 class MemberTable extends React.Component<
   {
-    members: [];
-    onDeleteClick: (index: number) => void;
-    onEditClick: (index: number) => void;
+    entries: Member[];
+    onDeleteClick: (index: string) => void;
+    onEditClick: (index: string) => void;
   },
   {}
 > {
   generateRows = () => {
-    return this.props.members.map((e) => {
-      const { id, title } = e;
+    return this.props.entries.map((e) => {
+      const { id, username, isOhrwurmSupervisor } = e;
 
       return {
         id,
-        name: title,
-        actions: (
-          <MDBRow>
-            <MDBCol size="2">
-              <MDBIcon
-                icon="pencil-alt"
-                size="lg"
-                onClick={() => this.props.onEditClick(e)}
-              />
-            </MDBCol>
-            <MDBCol size="2">
-              <MDBIcon
-                icon="trash-alt"
-                size="lg"
-                onClick={() => this.props.onDeleteClick(e)}
-              />
-            </MDBCol>
-          </MDBRow>
-        ),
+        username,
+        isOhrwurmSupervisor,
       };
     });
   };
@@ -51,22 +45,46 @@ class MemberTable extends React.Component<
   state = {
     columns: [
       {
-        label: "Name",
-        field: "name",
-        width: 300,
-        attributes: {
-          "aria-controls": "DataTable",
-          "aria-label": "Name",
-        },
+        name: "Username",
+        selector: "username",
+        sortable: true,
+        grow: 0.2,
       },
       {
-        label: "Actions",
-        field: "actions",
-        width: 300,
-        sort: "disabled",
+        name: "Supervisor",
+        selector: "isOhrwurmSupervisor",
+      },
+      {
+        name: undefined,
+        // cell: (row: any) => <MDBIcon icon="ellipsis-v" />,
+        cell: (e: any) => (
+          <MDBBtnGroup>
+            <MDBDropdown>
+              <MDBDropdownToggle color="blue">
+                <MDBIcon icon="ellipsis-v" />
+              </MDBDropdownToggle>
+              <MDBDropdownMenu color="danger">
+                <MDBDropdownItem onClick={() => this.props.onEditClick(e.id)}>
+                  {"View"}
+                </MDBDropdownItem>
+                <MDBDropdownItem divider />
+                <MDBDropdownItem onClick={() => this.props.onDeleteClick(e.id)}>
+                  <MDBIcon
+                    className="red-text pr-3"
+                    icon="trash"
+                    color="danger"
+                  />
+                  {" Delete"}
+                </MDBDropdownItem>
+              </MDBDropdownMenu>
+            </MDBDropdown>
+          </MDBBtnGroup>
+        ),
+        allowOverflow: true,
+        button: true,
+        width: "120px", // custom width for icon button
       },
     ],
-    rows: this.generateRows(),
   };
 
   componentDidUpdate(prevProps: any, prevState: any) {
@@ -77,12 +95,14 @@ class MemberTable extends React.Component<
 
   render() {
     return (
-      <MDBDataTableV5
-        hover
-        scrollY
-        searching={false}
-        maxHeight="100%"
-        data={this.state}
+      <DataTable
+        noHeader
+        columns={this.state.columns}
+        data={this.generateRows()}
+        highlightOnHover
+        defaultSortField="name"
+        overflowY
+        pagination
       />
     );
   }
