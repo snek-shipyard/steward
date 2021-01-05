@@ -34,6 +34,7 @@ export const USER_CHANGE_PASSWORD_SUCCESS = "USER_CHANGE_PASSWORD_SUCCESS";
 export interface UserState extends ErrorState {
   anonymous?: boolean;
   passwordChanged?: boolean;
+  isOhrwurmSupervisor?: boolean;
   username?: string;
 }
 
@@ -60,6 +61,16 @@ export const OHRWURM_SEARCH_PACS_REQUEST = "OHRWURM_SEARCH_PACS_REQUEST";
 export const OHRWURM_SEARCH_PACS_SUCCESS = "OHRWURM_SEARCH_PACS_SUCCESS";
 export const OHRWURM_SEARCH_PACS_FAILURE = "OHRWURM_SEARCH_PACS_FAILURE";
 
+export const OHRWURM_ADD_PAC_REQUEST = "OHRWURM_ADD_PAC_REQUEST";
+export const OHRWURM_ADD_PAC_SUCCESS = "OHRWURM_ADD_PAC_SUCCESS";
+export const OHRWURM_ADD_PAC_FAILURE = "OHRWURM_ADD_PAC_FAILURE";
+export const OHRWURM_DELETE_PAC_REQUEST = "OHRWURM_DELETE_PAC_REQUEST";
+export const OHRWURM_DELETE_PAC_SUCCESS = "OHRWURM_DELETE_PAC_SUCCESS";
+export const OHRWURM_DELETE_PAC_FAILURE = "OHRWURM_DELETE_PAC_FAILURE";
+export const OHRWURM_UPDATE_PAC_REQUEST = "OHRWURM_UPDATE_PAC_REQUEST";
+export const OHRWURM_UPDATE_PAC_SUCCESS = "OHRWURM_UPDATE_PAC_SUCCESS";
+export const OHRWURM_UPDATE_PAC_FAILURE = "OHRWURM_UPDATE_PAC_FAILURE";
+
 export const OHRWURM_FETCH_TRACKS_REQUEST = "OHRWURM_FETCH_TRACKS_REQUEST";
 export const OHRWURM_FETCH_TRACKS_SUCCESS = "OHRWURM_FETCH_TRACKS_SUCCESS";
 export const OHRWURM_FETCH_TRACKS_FAILURE = "OHRWURM_FETCH_TRACKS_FAILURE";
@@ -76,10 +87,31 @@ export const OHRWURM_SEARCH_TRACKS_REQUEST = "OHRWURM_SEARCH_TRACKS_REQUEST";
 export const OHRWURM_SEARCH_TRACKS_SUCCESS = "OHRWURM_SEARCH_TRACKS_SUCCESS";
 export const OHRWURM_SEARCH_TRACKS_FAILURE = "OHRWURM_SEARCH_TRACKS_FAILURE";
 
+export const OHRWURM_FETCH_MEMBERS_REQUEST = "OHRWURM_FETCH_MEMBERS_REQUEST";
+export const OHRWURM_FETCH_MEMBERS_SUCCESS = "OHRWURM_FETCH_MEMBERS_SUCCESS";
+export const OHRWURM_FETCH_MEMBERS_FAILURE = "OHRWURM_FETCH_MEMBERS_FAILURE";
+export const OHRWURM_ADD_MEMBER_REQUEST = "OHRWURM_ADD_MEMBER_REQUEST";
+export const OHRWURM_ADD_MEMBER_SUCCESS = "OHRWURM_ADD_MEMBER_SUCCESS";
+export const OHRWURM_ADD_MEMBER_FAILURE = "OHRWURM_ADD_MEMBER_FAILURE";
+export const OHRWURM_DELETE_MEMBER_REQUEST = "OHRWURM_DELETE_MEMBER_REQUEST";
+export const OHRWURM_DELETE_MEMBER_SUCCESS = "OHRWURM_DELETE_MEMBER_SUCCESS";
+export const OHRWURM_DELETE_MEMBER_FAILURE = "OHRWURM_DELETE_MEMBER_FAILURE";
+export const OHRWURM_UPDATE_MEMBER_REQUEST = "OHRWURM_UPDATE_MEMBER_REQUEST";
+export const OHRWURM_UPDATE_MEMBER_SUCCESS = "OHRWURM_UPDATE_MEMBER_SUCCESS";
+export const OHRWURM_UPDATE_MEMBER_FAILURE = "OHRWURM_UPDATE_MEMBER_FAILURE";
+
+export interface Member {
+  id: string;
+  username: string;
+  isOhrwurmSupervisor?: boolean;
+}
+
 export interface PAC {
-  id: number;
+  id: string;
   title: string;
-  description: string;
+  description?: string;
+  channelId?: string;
+  members?: Member[];
 }
 
 export type Significance =
@@ -93,7 +125,7 @@ export type Significance =
 export type TagType = { name: string; significance: Significance };
 
 export interface Track {
-  id: number;
+  id: string;
   title?: string;
   createdAt?: Date;
   description?: string;
@@ -111,9 +143,16 @@ export interface OhrwurmState extends ErrorState {
     items: PAC[];
   };
   tracks?: {
-    pacId: number;
+    pacId: string;
     pagination: Pagination;
     items?: Track[];
+  };
+  members?: {
+    added?: {
+      username: string;
+      generatedPassword: string;
+    };
+    items?: Member[];
   };
 }
 
@@ -122,6 +161,15 @@ export type OhrwurmAction = {
     | typeof OHRWURM_FETCH_PACS_REQUEST
     | typeof OHRWURM_FETCH_PACS_SUCCESS
     | typeof OHRWURM_FETCH_PACS_FAILURE
+    | typeof OHRWURM_ADD_PAC_REQUEST
+    | typeof OHRWURM_ADD_PAC_SUCCESS
+    | typeof OHRWURM_ADD_PAC_FAILURE
+    | typeof OHRWURM_DELETE_PAC_REQUEST
+    | typeof OHRWURM_DELETE_PAC_SUCCESS
+    | typeof OHRWURM_DELETE_PAC_FAILURE
+    | typeof OHRWURM_UPDATE_PAC_REQUEST
+    | typeof OHRWURM_UPDATE_PAC_SUCCESS
+    | typeof OHRWURM_UPDATE_PAC_FAILURE
     | typeof OHRWURM_SEARCH_PACS_REQUEST
     | typeof OHRWURM_SEARCH_PACS_SUCCESS
     | typeof OHRWURM_SEARCH_PACS_FAILURE
@@ -139,7 +187,19 @@ export type OhrwurmAction = {
     | typeof OHRWURM_UPDATE_TRACK_FAILURE
     | typeof OHRWURM_SEARCH_TRACKS_REQUEST
     | typeof OHRWURM_SEARCH_TRACKS_SUCCESS
-    | typeof OHRWURM_SEARCH_TRACKS_FAILURE;
+    | typeof OHRWURM_SEARCH_TRACKS_FAILURE
+    | typeof OHRWURM_FETCH_MEMBERS_REQUEST
+    | typeof OHRWURM_FETCH_MEMBERS_FAILURE
+    | typeof OHRWURM_FETCH_MEMBERS_SUCCESS
+    | typeof OHRWURM_ADD_MEMBER_REQUEST
+    | typeof OHRWURM_ADD_MEMBER_FAILURE
+    | typeof OHRWURM_ADD_MEMBER_SUCCESS
+    | typeof OHRWURM_DELETE_MEMBER_REQUEST
+    | typeof OHRWURM_DELETE_MEMBER_FAILURE
+    | typeof OHRWURM_DELETE_MEMBER_SUCCESS
+    | typeof OHRWURM_UPDATE_MEMBER_REQUEST
+    | typeof OHRWURM_UPDATE_MEMBER_FAILURE
+    | typeof OHRWURM_UPDATE_MEMBER_SUCCESS;
   payload?: OhrwurmState;
 };
 //#endregion

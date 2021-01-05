@@ -53,7 +53,7 @@ interface State {
   transcriptTitle?: string;
   transcriptText: string;
   searchQuery?: string;
-  selectedProjectIndex?: number;
+  selectedProjectIndex?: string;
   editingProject: boolean;
   projectModal: boolean;
   trackModal: boolean;
@@ -124,7 +124,7 @@ class Ohrwurm extends React.Component<Props, State> {
     this.setState({ activeTable: table });
   };
 
-  selectProject = (index: number) => {
+  selectProject = (index: string) => {
     console.log(this.state.editingProject, "XXXXXXXXXXXXXXXXXXX");
     if (!this.state.editingProject) {
       this.props.fetchPACTracks(index);
@@ -135,12 +135,12 @@ class Ohrwurm extends React.Component<Props, State> {
     }
   };
 
-  deleteProject = (index: number) => {
+  deleteProject = (index: string) => {
     this.setState({ selectedProjectIndex: index });
     this.state.editingProject = true;
   };
 
-  editProject = (index: number) => {
+  editProject = (index: string) => {
     this.setState({ selectedProjectIndex: index });
     this.state.editingProject = true;
   };

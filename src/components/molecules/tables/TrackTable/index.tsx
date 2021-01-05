@@ -70,16 +70,6 @@ class TrackTable extends React.Component<
             ))}
           </>
         ),
-        transcript: (
-          <MDBBtn
-            rounded
-            outline
-            color="primary"
-            onClick={() => this.props.onTranscriptClick(e)}
-          >
-            <MDBIcon icon="file" /> Open
-          </MDBBtn>
-        ),
         audio: (
           <ReactPlayer
             url={audioFileUrl}
@@ -91,6 +81,14 @@ class TrackTable extends React.Component<
         ),
         actions: (
           <MDBRow>
+            <MDBCol size="2">
+              <MDBIcon
+                icon="file"
+                size="lg"
+                color="blue"
+                onClick={() => this.props.onTranscriptClick(e)}
+              />
+            </MDBCol>
             <MDBCol size="2">
               <MDBIcon
                 icon="pencil-alt"
@@ -138,12 +136,6 @@ class TrackTable extends React.Component<
         width: 300,
       },
       {
-        label: "Transcript",
-        field: "transcript",
-        width: 300,
-        sort: "disabled",
-      },
-      {
         label: "Audio",
         field: "audio",
         width: 300,
@@ -172,7 +164,7 @@ class TrackTable extends React.Component<
         hover
         scrollY
         searching={false}
-        maxHeight="300px"
+        maxHeight="100%"
         data={this.state}
       />
     );

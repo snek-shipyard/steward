@@ -24,6 +24,7 @@ const userReducer = (state = INIT_STATE, action: LoginAction): UserState => {
     case "USER_LOGIN_SUCCESS":
       return {
         username: payload?.username,
+        isOhrwurmSupervisor: payload?.isOhrwurmSupervisor,
         passwordChanged: payload?.passwordChanged,
         anonymous: payload?.anonymous,
       };
@@ -37,6 +38,7 @@ const userReducer = (state = INIT_STATE, action: LoginAction): UserState => {
     case "USER_LOGOUT_SUCCESS":
       return {
         anonymous: true,
+        isOhrwurmSupervisor: undefined,
         passwordChanged: undefined,
         username: undefined,
       };

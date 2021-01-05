@@ -14,9 +14,9 @@ import { PAC } from "../../../../store/types";
 class ProjectTable extends React.Component<
   {
     entries: PAC[];
-    onClick: (index: number) => void;
-    onDeleteClick: (index: number) => void;
-    onEditClick: (index: number) => void;
+    onClick: (index: string) => void;
+    onDeleteClick: (index: string) => void;
+    onEditClick: (index: string) => void;
   },
   {}
 > {
@@ -88,7 +88,7 @@ class ProjectTable extends React.Component<
         hover
         scrollY
         searching={false}
-        maxHeight="300px"
+        maxHeight="100%"
         data={this.state}
       />
     );
