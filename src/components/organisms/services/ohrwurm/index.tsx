@@ -25,7 +25,12 @@ import Dropzone from "react-dropzone";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track, TagType } from "../../../../store/types";
+import {
+  UserState,
+  OhrwurmState,
+  Track,
+  TagType,
+} from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
@@ -63,6 +68,7 @@ interface State {
 }
 interface OwnProps {}
 interface StateProps {
+  user: UserState;
   ohrwurm: OhrwurmState;
 }
 interface DispatchProps {
@@ -292,6 +298,7 @@ class Ohrwurm extends React.Component<Props, State> {
         </MDBContainer>
         {this.state.activeTable === "PROJECT" ? (
           <ProjectTable
+            modify={this.props.user.isOhrwurmSupervisor}
             entries={
               this.props.ohrwurm.pacs?.items
                 ? this.props.ohrwurm.pacs.items
@@ -324,6 +331,7 @@ class Ohrwurm extends React.Component<Props, State> {
                 <div {...getRootProps()}>
                   <input {...getInputProps()} />
                   <TrackTable
+                    modify={this.props.user.isOhrwurmSupervisor}
                     entries={
                       this.props.ohrwurm.tracks?.items
                         ? this.props.ohrwurm.tracks.items
@@ -357,7 +365,10 @@ class Ohrwurm extends React.Component<Props, State> {
 //#endregion
 
 //#region > Redux Mapping
-const mapStateToProps = (state: RootState) => ({ ohrwurm: state.ohrwurm });
+const mapStateToProps = (state: RootState) => ({
+  user: state.user,
+  ohrwurm: state.ohrwurm,
+});
 
 const mapDispatchToProps = {
   fetchPACS: fetchPACSAction,

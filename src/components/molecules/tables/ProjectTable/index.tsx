@@ -25,6 +25,7 @@ import { PAC } from "../../../../store/types";
 class ProjectTable extends React.Component<
   {
     entries: PAC[];
+    modify?: boolean;
     onClick: (index: string) => void;
     onDeleteClick: (index: string) => void;
     onEditClick: (index: string) => void;
@@ -59,7 +60,7 @@ class ProjectTable extends React.Component<
         name: undefined,
         // cell: (row: any) => <MDBIcon icon="ellipsis-v" />,
         cell: (e: any) => (
-          <MDBBtnGroup>
+          <MDBBtnGroup hidden={this.props.modify ? false : true}>
             <MDBDropdown>
               <MDBDropdownToggle color="blue">
                 <MDBIcon icon="ellipsis-v" />

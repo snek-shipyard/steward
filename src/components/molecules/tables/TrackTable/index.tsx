@@ -34,6 +34,7 @@ import { MDBContainer } from "mdbreact";
 class TrackTable extends React.Component<
   {
     entries: Track[];
+    modify?: boolean;
     onTranscriptClick: (track: Track) => void;
     onDeleteClick: (track: Track) => void;
     onEditClick: (track: Track) => void;
@@ -137,12 +138,21 @@ class TrackTable extends React.Component<
                 >
                   {"Show transcript"}
                 </MDBDropdownItem>
-                <MDBDropdownItem onClick={() => this.props.onEditClick(e)}>
+                <MDBDropdownItem
+                  hidden={this.props.modify ? false : true}
+                  onClick={() => this.props.onEditClick(e)}
+                >
                   {"View"}
                 </MDBDropdownItem>
                 <MDBDropdownItem disabled>Download </MDBDropdownItem>
-                <MDBDropdownItem divider />
-                <MDBDropdownItem onClick={() => this.props.onDeleteClick(e)}>
+                <MDBDropdownItem
+                  divider
+                  hidden={this.props.modify ? false : true}
+                />
+                <MDBDropdownItem
+                  hidden={this.props.modify ? false : true}
+                  onClick={() => this.props.onDeleteClick(e)}
+                >
                   <MDBIcon
                     className="red-text pr-3"
                     icon="trash"
