@@ -104,9 +104,9 @@ class MemberModal extends React.Component<Props, State> {
     let { username, isOhrwurmSupervisor } = this.state;
 
     if (this.state.editing) {
-      await this.props.updateMember(username, isOhrwurmSupervisor);
+      await this.props.updateMember(username, undefined, isOhrwurmSupervisor);
     } else {
-      await this.props.addMember(username, isOhrwurmSupervisor);
+      await this.props.addMember(username, undefined, isOhrwurmSupervisor);
     }
 
     this.props.toggle();
