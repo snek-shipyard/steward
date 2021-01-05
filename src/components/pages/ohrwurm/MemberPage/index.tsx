@@ -41,17 +41,22 @@ interface State {
   searchQuery: string;
   memberModal: boolean;
 }
-interface OwnProps {
-  fetchMembersAction: () => void;
-  addMemberAction: (username: string, isOhrwurmSupervisor?: boolean) => void;
-  deleteMemberAction: (username: string) => void;
-  updateMemberAction: (username: string, isOhrwurmSupervisor: boolean) => void;
-}
+interface OwnProps {}
 interface StateProps {
   user: UserState;
   ohrwurm: OhrwurmState;
 }
-interface Props extends OwnProps, StateProps, RouteComponentProps {}
+interface DispatchProps {
+  fetchMembers: () => void;
+  addMember: (username: string, isOhrwurmSupervisor?: boolean) => void;
+  deleteMember: (username: string) => void;
+  updateMember: (username: string, isOhrwurmSupervisor: boolean) => void;
+}
+interface Props
+  extends OwnProps,
+    StateProps,
+    DispatchProps,
+    RouteComponentProps {}
 //#endregion
 
 //#region > Components
@@ -136,7 +141,7 @@ const mapStateToProps = (state: RootState) => ({
 
 const mapDispatchToProps = {
   login: loginAction,
-  fetchMember: fetchMembersAction,
+  fetchMembers: fetchMembersAction,
   addMember: addMemberAction,
   deleteMember: deleteMemberAction,
   updateMember: updateMemberAction,
