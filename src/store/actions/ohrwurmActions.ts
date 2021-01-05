@@ -810,6 +810,7 @@ const fetchMembersAction = (): ThunkAction<
 
 const addMemberAction = (
   username: string,
+  pacs?: string[], // list of pacId
   isOhrwurmSupervisor?: boolean
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
@@ -822,11 +823,13 @@ const addMemberAction = (
         mutation addPAC(
           $token: String!
           $username: String!
+          $pacs: [ID]
           $isSupervisor: Boolean
         ) {
           addOhrwurmMember(
             token: $token
             username: $username
+            pacs: $pacs
             isSupervisor: $isSupervisor
           ) {
             member {
@@ -843,7 +846,7 @@ const addMemberAction = (
           member: Member;
           generatedPassword: string;
         };
-      }>("mutation", dataSheet, { username, isOhrwurmSupervisor });
+      }>("mutation", dataSheet, { username, pacs, isOhrwurmSupervisor });
 
       if (errors) {
         throw new Error(errors[0].message);
@@ -946,7 +949,8 @@ const deleteMemberAction = (
 
 const updateMemberAction = (
   username: string,
-  isSupervisor: boolean
+  pacs?: string[], // list of pacId
+  isSupervisor?: boolean
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
     dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
@@ -958,11 +962,13 @@ const updateMemberAction = (
         mutation updateOhrwurmMember(
           $token: String!
           $username: String!
-          $isSupervisor: Boolean!
+          $pacs: [ID]
+          $isSupervisor: Boolean
         ) {
           updateOhrwurmMember(
             token: $token
             username: $username
+            pacs: $pacs
             isSupervisor: $isSupervisor
           ) {
             member {
@@ -978,7 +984,7 @@ const updateMemberAction = (
         updateOhrwurmMember: {
           member: Member;
         };
-      }>("mutation", dataSheet, { username, isSupervisor });
+      }>("mutation", dataSheet, { username, pacs, isSupervisor });
 
       if (errors) {
         throw new Error(errors[0].message);

@@ -50,9 +50,17 @@ interface StateProps {
 }
 interface DispatchProps {
   fetchMembers: () => void;
-  addMember: (username: string, isOhrwurmSupervisor?: boolean) => void;
+  addMember: (
+    username: string,
+    pacs?: string[],
+    isOhrwurmSupervisor?: boolean
+  ) => void;
   deleteMember: (username: string) => void;
-  updateMember: (username: string, isOhrwurmSupervisor: boolean) => void;
+  updateMember: (
+    username: string,
+    pacs?: string[],
+    isOhrwurmSupervisor?: boolean
+  ) => void;
 }
 interface Props
   extends OwnProps,
