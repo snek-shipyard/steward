@@ -34,6 +34,7 @@ export const USER_CHANGE_PASSWORD_SUCCESS = "USER_CHANGE_PASSWORD_SUCCESS";
 export interface UserState extends ErrorState {
   anonymous?: boolean;
   passwordChanged?: boolean;
+  isOhrwurmSupervisor?: boolean;
   username?: string;
 }
 

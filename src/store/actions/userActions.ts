@@ -45,10 +45,11 @@ const loginAction = (user?: {
       if (!whoami?.anonymous && whoami?.__typename === "SNEKUser") {
         // Extra whoami request because .session.begin() does not support
         // passwordChanged return value
-        const passwordChanged = await getClientSnek()
+        const { passwordChanged, isOhrwurmSupervisor } = await getClientSnek()
           .session.runner<{
             me: {
               passwordChanged: boolean;
+              isOhrwurmSupervisor: boolean;
             };
           }>(
             "query",
@@ -56,6 +57,7 @@ const loginAction = (user?: {
               query whoami($token: String!) {
                 me(token: $token) {
                   passwordChanged
+                  isOhrwurmSupervisor
                 }
               }
             `,
@@ -65,7 +67,7 @@ const loginAction = (user?: {
             if (!data || errors) {
               throw Error("Login failed");
             }
-            return data.me.passwordChanged;
+            return data.me;
           });
 
         dispatch({
@@ -73,6 +75,7 @@ const loginAction = (user?: {
           payload: {
             username: whoami.username,
             passwordChanged: passwordChanged,
+            isOhrwurmSupervisor: isOhrwurmSupervisor,
             anonymous: false,
           },
         });
