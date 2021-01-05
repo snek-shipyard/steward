@@ -264,7 +264,7 @@ const addTrackAction = (
           $token: String!
           $pacId: ID!
           $title: String!
-          $attendees: [String]
+          $attendees: [AttendeeType]
           $audioFile: Upload
           $createdAt: DateTime
           $description: String
@@ -428,7 +428,7 @@ const updateTrackAction = (
           $token: String!
           $id: ID!
           $title: String
-          $attendees: [String]
+          $attendees: [AttendeeType]
           $description: String
           $tags: [TagType]
         ) {
