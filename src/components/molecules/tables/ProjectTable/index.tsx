@@ -4,7 +4,18 @@
 import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
-import { MDBDataTableV5, MDBRow, MDBCol, MDBIcon } from "mdbreact";
+import {
+  MDBBtn,
+  MDBInput,
+  MDBIcon,
+  MDBDropdown,
+  MDBDropdownMenu,
+  MDBDropdownToggle,
+  MDBDropdownItem,
+  MDBBtnGroup,
+} from "mdbreact";
+//> Data Table
+import DataTable from "react-data-table-component";
 
 //> Store Types
 import { PAC } from "../../../../store/types";
@@ -28,25 +39,6 @@ class ProjectTable extends React.Component<
         id,
         name: title,
         description,
-        actions: (
-          <MDBRow>
-            <MDBCol size="2">
-              <MDBIcon
-                icon="pencil-alt"
-                size="lg"
-                onClick={() => this.props.onEditClick(e.id)}
-              />
-            </MDBCol>
-            <MDBCol size="2">
-              <MDBIcon
-                icon="trash-alt"
-                size="lg"
-                onClick={() => this.props.onDeleteClick(e.id)}
-              />
-            </MDBCol>
-          </MDBRow>
-        ),
-        clickEvent: () => this.props.onClick(e.id),
       };
     });
   };
@@ -54,26 +46,46 @@ class ProjectTable extends React.Component<
   state = {
     columns: [
       {
-        label: "Name",
-        field: "name",
-        width: 300,
-        attributes: {
-          "aria-controls": "DataTable",
-          "aria-label": "Name",
-        },
+        name: "Name",
+        selector: "name",
+        sortable: true,
+        grow: 0.2,
       },
       {
-        label: "Description",
-        field: "description",
+        name: "Description",
+        selector: "description",
       },
       {
-        label: "Actions",
-        field: "actions",
-        width: 300,
-        sort: "disabled",
+        name: undefined,
+        // cell: (row: any) => <MDBIcon icon="ellipsis-v" />,
+        cell: (e: any) => (
+          <MDBBtnGroup>
+            <MDBDropdown>
+              <MDBDropdownToggle color="blue">
+                <MDBIcon icon="ellipsis-v" />
+              </MDBDropdownToggle>
+              <MDBDropdownMenu color="danger">
+                <MDBDropdownItem onClick={() => this.props.onEditClick(e.id)}>
+                  {"View"}
+                </MDBDropdownItem>
+                <MDBDropdownItem divider />
+                <MDBDropdownItem onClick={() => this.props.onDeleteClick(e.id)}>
+                  <MDBIcon
+                    className="red-text pr-3"
+                    icon="trash"
+                    color="danger"
+                  />
+                  {" Delete"}
+                </MDBDropdownItem>
+              </MDBDropdownMenu>
+            </MDBDropdown>
+          </MDBBtnGroup>
+        ),
+        allowOverflow: true,
+        button: true,
+        width: "120px", // custom width for icon button
       },
     ],
-    rows: this.generateRows(),
   };
 
   componentDidUpdate(prevProps: any, prevState: any) {
@@ -84,12 +96,16 @@ class ProjectTable extends React.Component<
 
   render() {
     return (
-      <MDBDataTableV5
-        hover
-        scrollY
-        searching={false}
-        maxHeight="100%"
-        data={this.state}
+      <DataTable
+        noHeader
+        columns={this.state.columns}
+        data={this.generateRows()}
+        selectableRows
+        onRowClicked={(e) => this.props.onClick(e.id)}
+        highlightOnHover
+        defaultSortField="name"
+        overflowY
+        pagination
       />
     );
   }
