@@ -22,6 +22,8 @@ import {
 //> Redux
 import { connect } from "react-redux";
 
+//> Store Types
+import { UserState } from "../../../store/types";
 //> Store Actions
 import { RootState } from "../../../store/reducers/index";
 import { logoutAction } from "../../../store/actions/userActions";
@@ -35,7 +37,9 @@ interface State {
   isOpen: boolean;
 }
 interface OwnProps {}
-interface StateProps {}
+interface StateProps {
+  user: UserState;
+}
 interface DispatchProps {
   logout: () => void;
 }
@@ -67,7 +71,7 @@ class Navbar extends React.Component<Props, State> {
       <MDBNavbar color="default-color" dark expand="md">
         <MDBNavbarBrand>
           <>
-            <img src={logo}></img>
+            <img src={logo} alt="Logo"></img>
           </>
         </MDBNavbarBrand>
         <MDBNavbarToggler onClick={this.toggleCollapse} />
@@ -79,7 +83,15 @@ class Navbar extends React.Component<Props, State> {
                   <MDBIcon icon="user" />
                 </MDBDropdownToggle>
                 <MDBDropdownMenu right>
-                  <MDBDropdownItem href="change-password">
+                  <MDBDropdownItem
+                    hidden={!this.props.user.isOhrwurmSupervisor}
+                    onClick={() => this.props.history.push("/members")}
+                  >
+                    Members
+                  </MDBDropdownItem>
+                  <MDBDropdownItem
+                    onClick={() => this.props.history.push("/change-password")}
+                  >
                     Change password
                   </MDBDropdownItem>
                   <MDBDropdownItem href="#" onClick={() => this.logout()}>
@@ -97,7 +109,7 @@ class Navbar extends React.Component<Props, State> {
 //#endregion
 
 //#region > Redux Mapping
-const mapStateToProps = (state: RootState) => ({});
+const mapStateToProps = (state: RootState) => ({ user: state.user });
 
 const mapDispatchToProps = {
   logout: logoutAction,

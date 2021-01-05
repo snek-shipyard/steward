@@ -109,41 +109,44 @@ class MemberPage extends React.Component<Props, State> {
   render() {
     return (
       <>
-        <MDBContainer>
-          <Breadcrumbs
-            crumbs={[
-              {
-                name: "Ohrwurm",
-                // onClick: () => this.switchForm("SERVICE"),
-              },
-              {
-                name: "Members management",
-                active: true,
-              },
-            ]}
-          ></Breadcrumbs>
-          <MDBRow>
-            <MDBCol size="11">
-              <MDBInput
-                hint="Search"
-                type="text"
-                value={this.state.searchQuery}
-                containerClass="active-pink active-pink-2 mt-0 mb-3"
-                onChange={(e: any) => this.search(e.target.value)}
-              />
-            </MDBCol>
-            <MDBCol size="1">
-              <MDBBtn flat onClick={() => this.toggleMemberModal()}>
-                <MDBIcon icon="plus" size="lg" className="blue-text" />
-              </MDBBtn>
-            </MDBCol>
-          </MDBRow>
-          <MemberTable
-            entries={this.props.ohrwurm.members?.items}
-            onDeleteClick={(username: string) => this.deleteUser(username)}
-            onEditClick={(username: string) => this.editUser(username)}
-          ></MemberTable>
-        </MDBContainer>
+        <div id="base" className="mt-1">
+          <div className="ml-5 mr-5">
+            <Breadcrumbs
+              crumbs={[
+                {
+                  name: "Ohrwurm",
+                  onClick: () => this.props.history.push("/"),
+                },
+                {
+                  name: "Members management",
+                  active: true,
+                },
+              ]}
+            ></Breadcrumbs>
+            <MDBRow>
+              <MDBCol size="11">
+                <MDBInput
+                  disabled
+                  hint="Search"
+                  type="text"
+                  value={this.state.searchQuery}
+                  containerClass="active-pink active-pink-2 mt-0 mb-3"
+                  onChange={(e: any) => this.search(e.target.value)}
+                />
+              </MDBCol>
+              <MDBCol size="1">
+                <MDBBtn flat onClick={() => this.toggleMemberModal()}>
+                  <MDBIcon icon="plus" size="lg" className="blue-text" />
+                </MDBBtn>
+              </MDBCol>
+            </MDBRow>
+            <MemberTable
+              entries={this.props.ohrwurm.members?.items}
+              onDeleteClick={(username: string) => this.deleteUser(username)}
+              onEditClick={(username: string) => this.editUser(username)}
+            ></MemberTable>
+          </div>
+        </div>
         {this.state.memberModal && (
           <MemberModal
             toggle={this.toggleMemberModal}

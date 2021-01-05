@@ -249,7 +249,7 @@ class Ohrwurm extends React.Component<Props, State> {
         {this.state.activeTable === "PROJECT" ? (
           <Breadcrumbs
             crumbs={[
-              { name: "Ohrwurm" },
+              { name: "Ohrwurm", onClick: () => this.props.history.push("/") },
               {
                 name: "Projects",
                 active: true,
@@ -259,7 +259,7 @@ class Ohrwurm extends React.Component<Props, State> {
         ) : (
           <Breadcrumbs
             crumbs={[
-              { name: "Ohrwurm" },
+              { name: "Ohrwurm", onClick: () => this.props.history.push("/") },
               {
                 name: "Project",
                 onClick: () => this.switchTable("PROJECT"),
