@@ -33,7 +33,7 @@ import "./projectmodal.scss";
 
 //#region > Interfaces
 interface State {
-  title: string;
+  title?: string;
   description?: string;
   channelId?: string;
   members?: string[];
@@ -87,6 +87,7 @@ class ProjectModal extends React.Component<Props, State> {
             members: pac?.members?.map((member) => {
               return member.username;
             }),
+            editing: true,
           });
         }
       });
@@ -126,8 +127,23 @@ class ProjectModal extends React.Component<Props, State> {
 
   onSubmit = async () => {
     let { title, description, channelId, members } = this.state;
+    let id;
     if (this.state.editing) {
-      await this.props.updateTrack();
+      this.props.ohrwurm.pacs?.items.map((pac: PAC) => {
+        if (pac.id == this.props.selectedProjectIndex) {
+          id = pac.id;
+          if (pac.title === title) {
+            title = undefined;
+          }
+          if (pac.description === description) {
+            description = undefined;
+          }
+          if (pac.channelId === channelId) {
+            channelId = undefined;
+          }
+        }
+      });
+      await this.props.updateTrack(id, title, description, channelId, members);
     } else {
       await this.props.addTrack(title, description, channelId, members);
     }
