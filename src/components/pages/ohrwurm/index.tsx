@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 import { UserState } from "../../../store/types";
 import { RootState } from "../../../store/reducers/index";
 //> Components
-import { Ohrwurm, Navbar } from "../../organisms";
+import { Ohrwurm } from "../../organisms";
 //#endregion
 
 //#region > Interfaces

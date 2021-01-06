@@ -10,7 +10,7 @@ import gql from "graphql-tag";
 //> Client
 import { SnekClient } from "snek-client";
 
-//> Action Types
+//> Store Types
 import { RootState } from "../reducers/index";
 import {
   OhrwurmAction,
@@ -111,7 +111,6 @@ const fetchPACSAction = (
   ) => {
     let query;
     let variables;
-    console.log("HTDASJDKASFASF", getClientSnek);
 
     if (searchQuery) {
       query = gql`
@@ -124,6 +123,7 @@ const fetchPACSAction = (
           }
         }
       `;
+
       variables = { searchQuery };
     } else {
       query = gql`
@@ -141,7 +141,7 @@ const fetchPACSAction = (
     }
 
     dispatch({ type: "OHRWURM_FETCH_PACS_REQUEST" });
-    console.log(getClientSnek);
+
     const { data, errors } = await getClientSnek().session.runner<{
       projectAudioChannels: {
         pagination: Pagination;
@@ -211,6 +211,7 @@ const addPACAction = (
           }
         }
       `;
+
       dispatch({ type: "OHRWURM_ADD_PAC_REQUEST" });
 
       const { data, errors } = await getClientSnek().session.runner<{
@@ -222,7 +223,8 @@ const addPACAction = (
       if (errors) {
         throw new Error(errors[0].message);
       }
-      // add new pac to current pac items
+
+      //> add new pac to current pac items
       let pacs = getState().ohrwurm.pacs;
 
       if (!pacs) {
@@ -278,6 +280,7 @@ const deletePACAction = (
           }
         }
       `;
+
       dispatch({ type: "OHRWURM_DELETE_PAC_REQUEST" });
 
       const { data, errors } = await getClientSnek().session.runner<{
@@ -288,7 +291,7 @@ const deletePACAction = (
         throw new Error(errors[0].message);
       }
 
-      // add new pac to current pac items
+      //> add new pac to current pac items
       let pacs = getState().ohrwurm.pacs;
 
       if (!pacs) {
@@ -354,6 +357,7 @@ const updatePACAction = (
           }
         }
       `;
+
       dispatch({ type: "OHRWURM_UPDATE_PAC_REQUEST" });
 
       const { data, errors } = await getClientSnek().session.runner<{
@@ -366,8 +370,9 @@ const updatePACAction = (
         throw new Error(errors[0].message);
       }
 
-      // add new pac to current pac items
+      //> add new pac to current pac items
       let pacs = getState().ohrwurm.pacs;
+
       if (pacs && data) {
         const index = pacs.items.findIndex((item) => item.id === id);
 
@@ -443,6 +448,7 @@ const fetchPACTracksAction = (
 
         variables = { pac: pacId };
       }
+
       dispatch({ type: "OHRWURM_FETCH_TRACKS_REQUEST" });
 
       const { data, errors } = await getClientSnek().session.runner<{
@@ -532,6 +538,7 @@ const addTrackAction = (
           }
         }
       `;
+
       dispatch({ type: "OHRWURM_ADD_TRACK_REQUEST" });
 
       const { data, errors } = await getClientSnek().session.runner<{
@@ -551,7 +558,8 @@ const addTrackAction = (
       if (errors) {
         throw new Error(errors[0].message);
       }
-      // add new track to current track items
+
+      //> add new track to current track items
       let tracks = getState().ohrwurm.tracks;
 
       if (!tracks) {
@@ -616,6 +624,7 @@ const deleteTrackAction = (
           }
         }
       `;
+
       dispatch({ type: "OHRWURM_DELETE_TRACK_REQUEST" });
 
       const { data, errors } = await getClientSnek().session.runner<{
@@ -626,7 +635,7 @@ const deleteTrackAction = (
         throw new Error(errors[0].message);
       }
 
-      // add new track to current track items
+      //> add new track to current track items
       let tracks = getState().ohrwurm.tracks;
 
       if (!tracks) {
@@ -713,8 +722,9 @@ const updateTrackAction = (
         throw new Error(errors[0].message);
       }
 
-      // add new track to current track items
+      //> add new track to current track items
       let tracks = getState().ohrwurm.tracks;
+
       if (tracks?.items && data) {
         const index = tracks.items?.findIndex(
           (item) => item.id.toString() === id
@@ -826,7 +836,7 @@ const addMemberAction = (
   ) => {
     try {
       const dataSheet = gql`
-        mutation addPAC(
+        mutation addOhrwurmMember(
           $token: String!
           $username: String!
           $pacs: [ID]
@@ -857,7 +867,8 @@ const addMemberAction = (
       if (errors) {
         throw new Error(errors[0].message);
       }
-      // add new pac to current pac items
+
+      //> add new pac to current pac items
       let members = getState().ohrwurm.members;
 
       if (!members) {
@@ -866,6 +877,7 @@ const addMemberAction = (
 
       if (data) {
         members.items?.push(data.addOhrwurmMember.member);
+
         members.added = {
           username: data.addOhrwurmMember.member.username,
           generatedPassword: data.addOhrwurmMember.generatedPassword,
@@ -903,12 +915,13 @@ const deleteMemberAction = (
   ) => {
     try {
       const dataSheet = gql`
-        mutation deletePAC($token: String!, $username: String!) {
+        mutation deleteOhrwurmMember($token: String!, $username: String!) {
           deleteOhrwurmMember(token: $token, username: $username) {
             success
           }
         }
       `;
+
       dispatch({ type: "OHRWURM_DELETE_MEMBER_REQUEST" });
 
       const { data, errors } = await getClientSnek().session.runner<{
@@ -919,7 +932,7 @@ const deleteMemberAction = (
         throw new Error(errors[0].message);
       }
 
-      // add new pac to current pac items
+      //> add new pac to current pac items
       let members = getState().ohrwurm.members;
 
       if (!members) {
@@ -996,8 +1009,9 @@ const updateMemberAction = (
         throw new Error(errors[0].message);
       }
 
-      // add new pac to current pac items
+      //> add new pac to current pac items
       let members = getState().ohrwurm.members;
+
       if (members?.items && data) {
         const index = members.items?.findIndex(
           (item) => item.username === username

@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track, Member } from "../../../../store/types";
+import { OhrwurmState } from "../../../../store/types";
 //> Store Actions
 import { fetchPACSAction } from "../../../../store/actions/ohrwurmActions";
 //> Style Sheet
@@ -36,13 +36,14 @@ interface State {
   editing: boolean;
   pacs: string[];
 }
-interface OwnProps {}
-interface StateProps {
-  ohrwurm: OhrwurmState;
+interface OwnProps {
   toggle: any;
   addMember: any;
   updateMember: any;
   username: string;
+}
+interface StateProps {
+  ohrwurm: OhrwurmState;
 }
 interface DispatchProps {
   fetchPACS: (searchQuery?: string) => void;
@@ -52,11 +53,6 @@ interface Props
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-//#endregion
-
-//#region > Functions
-const truncate = (input: string) =>
-  input.length > 5 ? `${input.substring(0, 25)}...` : input;
 //#endregion
 
 //#region > Components
@@ -114,8 +110,6 @@ class MemberModal extends React.Component<Props, State> {
   search = (value: string) => {
     this.setState({ searchQuery: value });
     this.props.fetchPACS(value);
-
-    // Add search for users
   };
 
   onSubmit = async () => {
@@ -134,6 +128,7 @@ class MemberModal extends React.Component<Props, State> {
     if (this.state.pacs?.includes(id)) {
       return true;
     }
+
     return false;
   };
 

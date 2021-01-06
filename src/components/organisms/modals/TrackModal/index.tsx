@@ -24,6 +24,7 @@ import Dropzone from "react-dropzone";
 import moment from "moment";
 // Contains the functionality for tag inputs
 import ReactTagInput from "@snek-shipyard/react-tag-input";
+
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
 import {
@@ -59,14 +60,15 @@ interface State {
   audioFileUrl?: string;
   editing: boolean;
 }
-interface OwnProps {}
-interface StateProps {
-  ohrwurm: OhrwurmState;
+interface OwnProps {
   toggle: any;
   track: Track | undefined;
   addTrack: any;
   updateTrack: any;
   audioFile: any;
+}
+interface StateProps {
+  ohrwurm: OhrwurmState;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -78,11 +80,6 @@ interface Props
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-//#endregion
-
-//#region > Functions
-const truncate = (input: string) =>
-  input.length > 5 ? `${input.substring(0, 25)}...` : input;
 //#endregion
 
 //#region > Components
@@ -102,7 +99,6 @@ class TrackModal extends React.Component<Props, State> {
 
   componentWillMount = () => {
     if (this.props.track) {
-      const track = this.props.track;
       const {
         tags,
         title,
@@ -111,7 +107,7 @@ class TrackModal extends React.Component<Props, State> {
         description,
         attendees,
         audioFileUrl,
-      } = track;
+      } = this.props.track;
 
       this.setState({
         attendees: (attendees || []).map((attendee) => {
@@ -184,7 +180,7 @@ class TrackModal extends React.Component<Props, State> {
       if (description === this.props.track?.description) {
         description = undefined;
       }
-      if (tags == this.props.track?.tags) {
+      if (tags === this.props.track?.tags) {
         tags = undefined;
       }
 
@@ -222,6 +218,7 @@ class TrackModal extends React.Component<Props, State> {
     this.setState({
       loading: false,
     });
+
     this.props.toggle();
   };
 

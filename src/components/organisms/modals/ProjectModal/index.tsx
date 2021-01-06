@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track, PAC, Member } from "../../../../store/types";
+import { OhrwurmState, PAC, Member } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
@@ -41,13 +41,14 @@ interface State {
   editing: boolean;
   filteredMembers?: Member[];
 }
-interface OwnProps {}
-interface StateProps {
-  ohrwurm: OhrwurmState;
+interface OwnProps {
   toggle: any;
   selectedProjectIndex?: string;
   addTrack: any;
   updateTrack: any;
+}
+interface StateProps {
+  ohrwurm: OhrwurmState;
 }
 interface DispatchProps {
   // login: (user?: { username: string; password: string }) => void;
@@ -59,11 +60,6 @@ interface Props
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-//#endregion
-
-//#region > Functions
-const truncate = (input: string) =>
-  input.length > 5 ? `${input.substring(0, 25)}...` : input;
 //#endregion
 
 //#region > Components
@@ -80,20 +76,23 @@ class ProjectModal extends React.Component<Props, State> {
 
   componentWillMount = () => {
     if (this.props.selectedProjectIndex) {
-      this.props.ohrwurm.pacs?.items.map((pac: PAC) => {
-        if (pac.id == this.props.selectedProjectIndex) {
-          this.setState({
-            title: pac?.title || "",
-            description: pac?.description,
-            channelId: pac?.channelId,
-            members: pac?.members?.map((member) => {
-              return member.username;
-            }),
-            editing: true,
-          });
-        }
-      });
+      const pac = this.props.ohrwurm.pacs?.items?.find(
+        (pac) => pac.id === this.props.selectedProjectIndex
+      );
+
+      if (pac) {
+        this.setState({
+          title: pac?.title || "",
+          description: pac?.description,
+          channelId: pac?.channelId,
+          members: pac?.members?.map((member) => {
+            return member.username;
+          }),
+          editing: true,
+        });
+      }
     }
+
     this.setState({
       filteredMembers: this.props.ohrwurm.members?.items,
     });
@@ -138,23 +137,31 @@ class ProjectModal extends React.Component<Props, State> {
 
   onSubmit = async () => {
     let { title, description, channelId, members } = this.state;
-    let id;
+
     if (this.state.editing) {
-      this.props.ohrwurm.pacs?.items.map((pac: PAC) => {
-        if (pac.id == this.props.selectedProjectIndex) {
-          id = pac.id;
-          if (pac.title === title) {
-            title = undefined;
-          }
-          if (pac.description === description) {
-            description = undefined;
-          }
-          if (pac.channelId === channelId) {
-            channelId = undefined;
-          }
+      const pac = this.props.ohrwurm.pacs?.items?.find(
+        (e) => e.id === this.props.selectedProjectIndex
+      );
+
+      if (pac) {
+        if (pac.title === title) {
+          title = undefined;
         }
-      });
-      await this.props.updateTrack(id, title, description, channelId, members);
+        if (pac.description === description) {
+          description = undefined;
+        }
+        if (pac.channelId === channelId) {
+          channelId = undefined;
+        }
+
+        await this.props.updateTrack(
+          pac.id,
+          title,
+          description,
+          channelId,
+          members
+        );
+      }
     } else {
       await this.props.addTrack(title, description, channelId, members);
     }
@@ -166,6 +173,7 @@ class ProjectModal extends React.Component<Props, State> {
     if (this.state.members?.includes(username)) {
       return true;
     }
+
     return false;
   };
 

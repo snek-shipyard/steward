@@ -23,6 +23,7 @@ const ServiceGroup = (props: {
 }) => {
   // Declare a new state variable, which we'll call "count"
   const [activeItemIndex, setActiveItemIndex] = useState(0);
+
   return (
     <MDBContainer>
       <MDBRow className="justify-content-center">

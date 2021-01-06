@@ -23,9 +23,9 @@ import {
 import { connect } from "react-redux";
 
 //> Store Types
+import { RootState } from "../../../store/reducers/index";
 import { UserState } from "../../../store/types";
 //> Store Actions
-import { RootState } from "../../../store/reducers/index";
 import { logoutAction } from "../../../store/actions/userActions";
 //> Style Sheet
 import "./indes.scss";
@@ -62,7 +62,6 @@ class Navbar extends React.Component<Props, State> {
 
   async logout() {
     this.props.logout();
-
     this.props.history.push("/login");
   }
 

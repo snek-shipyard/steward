@@ -76,7 +76,6 @@ interface StateProps {
   ohrwurm: OhrwurmState;
 }
 interface DispatchProps {
-  // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
   fetchPACTracks: (pacId: string, searchQuery?: string) => void;
   fetchMember: () => void;
@@ -160,13 +159,16 @@ class Ohrwurm extends React.Component<Props, State> {
 
   deleteProject = async (index: string) => {
     this.state.editingProject = true;
-    await this.props.deletePAC(index);
-    this.state.editingProject = false;
+
+    this.setState({ editingProject: true }, () => {
+      this.props.deletePAC(index);
+      this.setState({ editingProject: false });
+    });
   };
 
   editProject = (index: string) => {
     this.setState({ selectedProjectIndex: index });
-    this.state.editingProject = true;
+    this.setState({ editingProject: true });
     this.toggleProjectModal();
   };
 
@@ -175,6 +177,7 @@ class Ohrwurm extends React.Component<Props, State> {
       transcriptTitle: track.title,
       transcriptText: track.transcript,
     });
+
     this.toggleTranscriptModal();
   };
 
@@ -200,6 +203,7 @@ class Ohrwurm extends React.Component<Props, State> {
     this.setState({
       projectModal: !this.state.projectModal,
     });
+
     if (this.state.projectModal) {
       this.setState({ selectedProjectIndex: "" });
     }
@@ -209,19 +213,21 @@ class Ohrwurm extends React.Component<Props, State> {
     this.setState({
       trackModal: !this.state.trackModal,
     });
+
     if (this.state.trackModal) {
       this.setState({ selectedTrack: undefined, audioFile: null });
     }
   };
 
   deleteTrack = async (track: Track) => {
-    await this.props.deleteTrack(track.id);
+    this.props.deleteTrack(track.id);
   };
 
   editTrack = (track: Track) => {
     this.setState({
       selectedTrack: track,
     });
+
     this.toggleTrackModal();
   };
 
@@ -241,9 +247,6 @@ class Ohrwurm extends React.Component<Props, State> {
   };
 
   render() {
-    const activeStyle = {
-      borderColor: "#2196f3",
-    };
     return (
       <>
         {this.state.activeTable === "PROJECT" ? (

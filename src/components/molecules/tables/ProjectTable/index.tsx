@@ -58,7 +58,6 @@ class ProjectTable extends React.Component<
       },
       {
         name: undefined,
-        // cell: (row: any) => <MDBIcon icon="ellipsis-v" />,
         cell: (e: any) => (
           <MDBBtnGroup hidden={this.props.modify ? false : true}>
             <MDBDropdown>

@@ -64,8 +64,7 @@ class LoginPage extends React.Component<Props, State> {
     this.switchForm("AUTH");
   };
 
-  submitAuth = (username: string, password: string) => {
-    console.log("TEST", username, password);
+  submitAuth = async (username: string, password: string) => {
     this.props.login({ username, password });
     this.props.history.push("/");
   };

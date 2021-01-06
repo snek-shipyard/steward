@@ -5,8 +5,6 @@ import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
 import {
-  MDBBtn,
-  MDBInput,
   MDBIcon,
   MDBDropdown,
   MDBDropdownMenu,
@@ -14,9 +12,7 @@ import {
   MDBDropdownItem,
   MDBBtnGroup,
   MDBBadge,
-  MDBChip,
-  MDBListGroup,
-  MDBListGroupItem,
+  MDBContainer,
 } from "mdbreact";
 //> Data Table
 import DataTable from "react-data-table-component";
@@ -27,7 +23,6 @@ import moment from "moment";
 
 //> Store Types
 import { Track } from "../../../../store/types";
-import { MDBContainer } from "mdbreact";
 //#endregion
 
 //#region > Compnents
@@ -52,6 +47,7 @@ class TrackTable extends React.Component<
         transcript,
         audioFileUrl,
       } = e;
+
       return {
         id,
         name: title,
@@ -124,7 +120,6 @@ class TrackTable extends React.Component<
       },
       {
         name: undefined,
-        // cell: (row: any) => <MDBIcon icon="ellipsis-v" />,
         cell: (e: any) => (
           <MDBBtnGroup>
             <MDBDropdown>

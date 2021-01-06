@@ -5,8 +5,6 @@ import React from "react";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
 import {
-  MDBBtn,
-  MDBInput,
   MDBIcon,
   MDBDropdown,
   MDBDropdownMenu,
@@ -56,7 +54,6 @@ class MemberTable extends React.Component<
       },
       {
         name: undefined,
-        // cell: (row: any) => <MDBIcon icon="ellipsis-v" />,
         cell: (e: any) => (
           <MDBBtnGroup>
             <MDBDropdown>

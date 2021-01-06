@@ -8,32 +8,24 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import { connect } from "react-redux";
 //> MDB
 // "Material Design for Bootstrap" is a great UI design framework
-import {
-  MDBContainer,
-  MDBCol,
-  MDBRow,
-  MDBInput,
-  MDBBtn,
-  MDBIcon,
-} from "mdbreact";
+import { MDBCol, MDBRow, MDBInput, MDBBtn, MDBIcon } from "mdbreact";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
 import { UserState, OhrwurmState } from "../../../../store/types";
 //> Store Actions
 import { loginAction } from "../../../../store/actions/userActions";
-//> Service Registry
-import Services from "../../../../serviceRegistry.json";
-//> Components
-import { Breadcrumbs } from "../../../atoms";
-import { LoginForm, ServiceGroup, MemberTable } from "../../../molecules";
-import { MemberModal } from "../../../organisms/modals";
 import {
   addMemberAction,
   deleteMemberAction,
   fetchMembersAction,
   updateMemberAction,
 } from "../../../../store/actions/ohrwurmActions";
+//> Components
+import { Breadcrumbs } from "../../../atoms";
+import { MemberTable } from "../../../molecules";
+import { MemberModal } from "../../../organisms/modals";
+
 //#endregion
 
 //#region > Interfaces
@@ -84,7 +76,7 @@ class MemberPage extends React.Component<Props, State> {
   };
 
   deleteUser = async (username: string) => {
-    await this.props.deleteMember(username);
+    this.props.deleteMember(username);
   };
 
   editUser = (username: string) => {
@@ -94,13 +86,13 @@ class MemberPage extends React.Component<Props, State> {
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
-    // Add search for users
   };
 
   toggleMemberModal = () => {
     this.setState({
       memberModal: !this.state.memberModal,
     });
+
     if (this.state.memberModal) {
       this.setState({ username: "" });
     }
