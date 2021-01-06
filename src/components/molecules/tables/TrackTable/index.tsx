@@ -128,10 +128,10 @@ class TrackTable extends React.Component<
         cell: (e: any) => (
           <MDBBtnGroup>
             <MDBDropdown>
-              <MDBDropdownToggle color="blue">
+              <MDBDropdownToggle color="white">
                 <MDBIcon icon="ellipsis-v" />
               </MDBDropdownToggle>
-              <MDBDropdownMenu color="danger">
+              <MDBDropdownMenu color="special">
                 <MDBDropdownItem disabled>Play</MDBDropdownItem>
                 <MDBDropdownItem
                   onClick={() => this.props.onTranscriptClick(e)}
@@ -142,9 +142,11 @@ class TrackTable extends React.Component<
                   hidden={this.props.modify ? false : true}
                   onClick={() => this.props.onEditClick(e)}
                 >
-                  {"View"}
+                  {"Edit"}
                 </MDBDropdownItem>
-                <MDBDropdownItem disabled>Download </MDBDropdownItem>
+                <MDBDropdownItem href={e.audioFileUrl} download>
+                  Download
+                </MDBDropdownItem>
                 <MDBDropdownItem
                   divider
                   hidden={this.props.modify ? false : true}
