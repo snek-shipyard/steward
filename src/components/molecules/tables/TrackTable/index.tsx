@@ -41,6 +41,7 @@ class TrackTable extends React.Component<
       const {
         id,
         title,
+        description,
         createdAt,
         tags,
         attendees,
@@ -50,8 +51,9 @@ class TrackTable extends React.Component<
 
       return {
         id,
-        name: title,
-        createdAt: moment(createdAt).calendar(),
+        title,
+        description,
+        createdAt,
         tags,
         attendees,
         transcript,
@@ -64,7 +66,7 @@ class TrackTable extends React.Component<
     columns: [
       {
         name: "Name",
-        selector: "name",
+        selector: "title",
         sortable: true,
         grow: 0.5,
       },
@@ -73,6 +75,9 @@ class TrackTable extends React.Component<
         selector: "createdAt",
         sortable: true,
         grow: 0.5,
+        cell: (e: any) => {
+          return <span>{moment(e.createdAt).calendar()}</span>;
+        },
       },
       {
         name: "Tags",
