@@ -104,6 +104,7 @@ export interface Member {
   id: string;
   username: string;
   isOhrwurmSupervisor?: boolean;
+  pacs: PAC[];
 }
 
 export interface PAC {

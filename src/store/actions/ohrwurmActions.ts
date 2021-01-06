@@ -34,6 +34,12 @@ const memberQueryFragment = `
   id
   username
   isOhrwurmSupervisor
+  pacs {
+    id
+    title
+    description
+    channelId
+  }
 `;
 
 const pacQueryFragment = `
@@ -824,13 +830,13 @@ const addMemberAction = (
           $token: String!
           $username: String!
           $pacs: [ID]
-          $isSupervisor: Boolean
+          $isOhrwurmSupervisor: Boolean
         ) {
           addOhrwurmMember(
             token: $token
             username: $username
             pacs: $pacs
-            isSupervisor: $isSupervisor
+            isOhrwurmSupervisor: $isOhrwurmSupervisor
           ) {
             member {
               ${memberQueryFragment}
@@ -950,7 +956,7 @@ const deleteMemberAction = (
 const updateMemberAction = (
   username: string,
   pacs?: string[], // list of pacId
-  isSupervisor?: boolean
+  isOhrwurmSupervisor?: boolean
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
     dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
@@ -963,13 +969,13 @@ const updateMemberAction = (
           $token: String!
           $username: String!
           $pacs: [ID]
-          $isSupervisor: Boolean
+          $isOhrwurmSupervisor: Boolean
         ) {
           updateOhrwurmMember(
             token: $token
             username: $username
             pacs: $pacs
-            isSupervisor: $isSupervisor
+            isOhrwurmSupervisor: $isOhrwurmSupervisor
           ) {
             member {
               ${memberQueryFragment}
@@ -984,7 +990,7 @@ const updateMemberAction = (
         updateOhrwurmMember: {
           member: Member;
         };
-      }>("mutation", dataSheet, { username, pacs, isSupervisor });
+      }>("mutation", dataSheet, { username, pacs, isOhrwurmSupervisor });
 
       if (errors) {
         throw new Error(errors[0].message);

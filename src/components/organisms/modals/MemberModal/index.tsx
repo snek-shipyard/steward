@@ -34,6 +34,7 @@ interface State {
   isOhrwurmSupervisor?: boolean;
   username: string;
   editing: boolean;
+  pacs: string[];
 }
 interface OwnProps {}
 interface StateProps {
@@ -65,6 +66,7 @@ class MemberModal extends React.Component<Props, State> {
     username: "",
     isOhrwurmSupervisor: false,
     editing: false,
+    pacs: [],
   };
 
   componentWillMount = () => {
@@ -80,6 +82,9 @@ class MemberModal extends React.Component<Props, State> {
           username: member.username,
           isOhrwurmSupervisor: member.isOhrwurmSupervisor,
           editing: true,
+          pacs: member.pacs.map((pac) => {
+            return pac.id;
+          }),
         });
       }
     }
@@ -93,6 +98,19 @@ class MemberModal extends React.Component<Props, State> {
     this.setState({ isOhrwurmSupervisor: e.currentTarget.checked });
   };
 
+  setProjects = (e: React.FormEvent<HTMLInputElement>): void => {
+    let { pacs } = this.state;
+    let pac = e.currentTarget.value;
+
+    if ((pacs || []).includes(pac)) {
+      pacs = pacs?.filter((f) => f !== pac);
+    } else {
+      pacs?.push(pac);
+    }
+
+    this.setState({ pacs });
+  };
+
   search = (value: string) => {
     this.setState({ searchQuery: value });
     this.props.fetchPACS(value);
@@ -101,15 +119,22 @@ class MemberModal extends React.Component<Props, State> {
   };
 
   onSubmit = async () => {
-    let { username, isOhrwurmSupervisor } = this.state;
+    let { username, isOhrwurmSupervisor, pacs } = this.state;
 
     if (this.state.editing) {
-      await this.props.updateMember(username, undefined, isOhrwurmSupervisor);
+      await this.props.updateMember(username, pacs, isOhrwurmSupervisor);
     } else {
-      await this.props.addMember(username, undefined, isOhrwurmSupervisor);
+      await this.props.addMember(username, pacs, isOhrwurmSupervisor);
     }
 
     this.props.toggle();
+  };
+
+  checkChecked = (id: string) => {
+    if (this.state.pacs?.includes(id)) {
+      return true;
+    }
+    return false;
   };
 
   render() {
@@ -165,11 +190,11 @@ class MemberModal extends React.Component<Props, State> {
                           type="checkbox"
                           id={id.toString()}
                           label={pac.title}
-                          value={pac.title}
-                          // checked={this.checkChecked(pac.title)}
-                          // onChange={(e: React.FormEvent<HTMLInputElement>) =>
-                          //   this.setMembers(e)
-                          // }
+                          value={pac.id}
+                          checked={this.checkChecked(pac.id)}
+                          onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                            this.setProjects(e)
+                          }
                         />
                       </MDBListGroupItem>
                     );
