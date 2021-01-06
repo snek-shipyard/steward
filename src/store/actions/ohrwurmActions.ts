@@ -34,6 +34,12 @@ const memberQueryFragment = `
   id
   username
   isOhrwurmSupervisor
+  pacs {
+    id
+    title
+    description
+    channelId
+  }
 `;
 
 const pacQueryFragment = `
@@ -224,13 +230,15 @@ const addPACAction = (
       }
 
       if (data) {
-        pacs?.items.push({
+        const items = pacs.items.concat({
           id: data.addPac.pac.id,
           title,
           description,
           channelId,
           members: data.addPac.pac.members,
         });
+
+        pacs.items = items;
       }
 
       dispatch({
@@ -808,6 +816,7 @@ const fetchMembersAction = (): ThunkAction<
 
 const addMemberAction = (
   username: string,
+  pacs?: string[], // list of pacId
   isOhrwurmSupervisor?: boolean
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
@@ -820,12 +829,14 @@ const addMemberAction = (
         mutation addPAC(
           $token: String!
           $username: String!
-          $isSupervisor: Boolean
+          $pacs: [ID]
+          $isOhrwurmSupervisor: Boolean
         ) {
           addOhrwurmMember(
             token: $token
             username: $username
-            isSupervisor: $isSupervisor
+            pacs: $pacs
+            isOhrwurmSupervisor: $isOhrwurmSupervisor
           ) {
             member {
               ${memberQueryFragment}
@@ -841,7 +852,7 @@ const addMemberAction = (
           member: Member;
           generatedPassword: string;
         };
-      }>("mutation", dataSheet, { username, isOhrwurmSupervisor });
+      }>("mutation", dataSheet, { username, pacs, isOhrwurmSupervisor });
 
       if (errors) {
         throw new Error(errors[0].message);
@@ -944,7 +955,8 @@ const deleteMemberAction = (
 
 const updateMemberAction = (
   username: string,
-  isSupervisor: boolean
+  pacs?: string[], // list of pacId
+  isOhrwurmSupervisor?: boolean
 ): ThunkAction<void, RootState, ohrwurmArguments, OhrwurmAction> => {
   return async (
     dispatch: ThunkDispatch<RootState, ohrwurmArguments, OhrwurmAction>,
@@ -956,12 +968,14 @@ const updateMemberAction = (
         mutation updateOhrwurmMember(
           $token: String!
           $username: String!
-          $isSupervisor: Boolean!
+          $pacs: [ID]
+          $isOhrwurmSupervisor: Boolean
         ) {
           updateOhrwurmMember(
             token: $token
             username: $username
-            isSupervisor: $isSupervisor
+            pacs: $pacs
+            isOhrwurmSupervisor: $isOhrwurmSupervisor
           ) {
             member {
               ${memberQueryFragment}
@@ -976,7 +990,7 @@ const updateMemberAction = (
         updateOhrwurmMember: {
           member: Member;
         };
-      }>("mutation", dataSheet, { username, isSupervisor });
+      }>("mutation", dataSheet, { username, pacs, isOhrwurmSupervisor });
 
       if (errors) {
         throw new Error(errors[0].message);

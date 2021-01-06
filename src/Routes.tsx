@@ -42,7 +42,7 @@ interface Props
 /** @class Route component which includes all routes to specified components */
 class Routes extends React.Component<Props, {}> {
   render() {
-    const { anonymous, passwordChanged } = this.props.user;
+    const { anonymous, passwordChanged, isOhrwurmSupervisor } = this.props.user;
     const location = this.props.location;
 
     if (anonymous && location.pathname === "/")
@@ -51,11 +51,14 @@ class Routes extends React.Component<Props, {}> {
     if (anonymous === false && location.pathname === "/login")
       this.props.history.push("/");
 
+    if (isOhrwurmSupervisor === false && location.pathname === "/members") {
+      this.props.history.push("/");
+    }
+
     return (
       <Switch>
         <Route exact path="/" component={() => <OhrwurmPage />} />
-        <Route exact path="/member" component={() => <OhrwurmMemberPage />} />
-
+        <Route exact path="/members" component={() => <OhrwurmMemberPage />} />
         <Route exact path="/login" component={() => <LoginPage />} />
         <Route
           exact

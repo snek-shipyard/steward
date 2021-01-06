@@ -11,12 +11,13 @@ import { useDispatch } from "react-redux";
 
 //> Components
 // Starts the page on top when reloaded or redirected
-import { ScrollToTop } from "./components/atoms";
+import { Navbar } from "./components/organisms";
+//> Store Actions
+import { loginAction } from "./store/actions/userActions";
 //> Stylesheet
 import "./App.css";
 //> Routes
 import Routes from "./Routes";
-import { loginAction } from "./store/actions/userActions";
 //#endregion
 
 //#region > Components
@@ -32,6 +33,7 @@ const App = () => {
 
   return (
     <>
+      <Navbar></Navbar>
       <div className="flyout">
         <main>
           <Routes />

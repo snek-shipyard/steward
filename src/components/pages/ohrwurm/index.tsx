@@ -40,7 +40,6 @@ class OhrwurmPage extends React.Component<Props, State> {
       <>
         {this.props.user.anonymous === false && (
           <>
-            <Navbar></Navbar>
             <div id="base" className="mt-1">
               <div className="ml-5 mr-5">
                 <Ohrwurm></Ohrwurm>

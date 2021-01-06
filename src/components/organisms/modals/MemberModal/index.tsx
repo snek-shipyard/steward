@@ -21,30 +21,31 @@ import { connect } from "react-redux";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track } from "../../../../store/types";
+import { OhrwurmState, Track, Member } from "../../../../store/types";
 //> Store Actions
-import {
-  fetchPACSAction,
-  fetchPACTracksAction,
-} from "../../../../store/actions/ohrwurmActions";
+import { fetchPACSAction } from "../../../../store/actions/ohrwurmActions";
 //> Style Sheet
 import "./membermodal.scss";
 //#endregion
 
 //#region > Interfaces
 interface State {
-  name: string;
   searchQuery?: string;
+  isOhrwurmSupervisor?: boolean;
+  username: string;
+  editing: boolean;
+  pacs: string[];
 }
 interface OwnProps {}
 interface StateProps {
   ohrwurm: OhrwurmState;
   toggle: any;
+  addMember: any;
+  updateMember: any;
+  username: string;
 }
 interface DispatchProps {
-  // login: (user?: { username: string; password: string }) => void;
   fetchPACS: (searchQuery?: string) => void;
-  fetchPACTracks: (pacId: string, searchQuery?: string) => void;
 }
 interface Props
   extends OwnProps,
@@ -61,18 +62,79 @@ const truncate = (input: string) =>
 //#region > Components
 class MemberModal extends React.Component<Props, State> {
   state: State = {
-    name: "name",
     searchQuery: "",
+    username: "",
+    isOhrwurmSupervisor: false,
+    editing: false,
+    pacs: [],
   };
 
-  setProjectName = (e: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({ name: e.currentTarget.value });
+  componentWillMount = () => {
+    this.props.fetchPACS();
+
+    if (this.props.username) {
+      const member = this.props.ohrwurm.members?.items?.find(
+        (member) => member.username === this.props.username
+      );
+
+      if (member) {
+        this.setState({
+          username: member.username,
+          isOhrwurmSupervisor: member.isOhrwurmSupervisor,
+          editing: true,
+          pacs: member.pacs.map((pac) => {
+            return pac.id;
+          }),
+        });
+      }
+    }
+  };
+
+  setUsername = (e: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({ username: e.currentTarget.value });
+  };
+
+  setSupervisor = (e: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({ isOhrwurmSupervisor: e.currentTarget.checked });
+  };
+
+  setProjects = (e: React.FormEvent<HTMLInputElement>): void => {
+    let { pacs } = this.state;
+    let pac = e.currentTarget.value;
+
+    if ((pacs || []).includes(pac)) {
+      pacs = pacs?.filter((f) => f !== pac);
+    } else {
+      pacs?.push(pac);
+    }
+
+    this.setState({ pacs });
   };
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
+    this.props.fetchPACS(value);
 
     // Add search for users
+  };
+
+  onSubmit = async () => {
+    let { username, isOhrwurmSupervisor, pacs } = this.state;
+
+    if (this.state.editing) {
+      await this.props.updateMember(username, pacs, isOhrwurmSupervisor);
+    } else {
+      await this.props.addMember(username, pacs, isOhrwurmSupervisor);
+    }
+
+    this.props.toggle();
+  };
+
+  checkChecked = (id: string) => {
+    if (this.state.pacs?.includes(id)) {
+      return true;
+    }
+    return false;
   };
 
   render() {
@@ -93,12 +155,22 @@ class MemberModal extends React.Component<Props, State> {
                 group
                 type="text"
                 validate
-                value={this.state.name}
+                disabled={this.state.editing}
+                value={this.state.username}
                 onChange={(e: React.FormEvent<HTMLInputElement>) =>
-                  this.setProjectName(e)
+                  this.setUsername(e)
                 }
               />
-
+              <MDBInput
+                label="Supervisor"
+                type="checkbox"
+                id="checkbox1"
+                checked={this.state.isOhrwurmSupervisor}
+                onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                  this.setSupervisor(e)
+                }
+              />
+              <br />
               <label>Projects</label>
               <div className="rounded mb-0 border border-light">
                 <div className="mb-0">
@@ -111,37 +183,22 @@ class MemberModal extends React.Component<Props, State> {
                   />
                 </div>
                 <MDBListGroup>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox1"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox3"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox2"
-                      label="David Pinterics"
-                    />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput type="checkbox" id="checkbox4" label="Hugo" />
-                  </MDBListGroupItem>
-                  <MDBListGroupItem>
-                    <MDBInput
-                      type="checkbox"
-                      id="checkbox5"
-                      label="TESTTSTST"
-                    />
-                  </MDBListGroupItem>
+                  {(this.props.ohrwurm?.pacs?.items || []).map((pac, id) => {
+                    return (
+                      <MDBListGroupItem>
+                        <MDBInput
+                          type="checkbox"
+                          id={id.toString()}
+                          label={pac.title}
+                          value={pac.id}
+                          checked={this.checkChecked(pac.id)}
+                          onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                            this.setProjects(e)
+                          }
+                        />
+                      </MDBListGroupItem>
+                    );
+                  })}
                 </MDBListGroup>
               </div>
               <div className="text-right mb-4 mt-5">
@@ -150,7 +207,7 @@ class MemberModal extends React.Component<Props, State> {
                   color="light-green"
                   type="button"
                   className="z-depth-2 btn-primary"
-                  onClick={() => alert()}
+                  onClick={() => this.onSubmit()}
                 >
                   Save
                 </MDBBtn>
@@ -169,7 +226,6 @@ const mapStateToProps = (state: RootState) => ({ ohrwurm: state.ohrwurm });
 
 const mapDispatchToProps = {
   fetchPACS: fetchPACSAction,
-  fetchPACTracks: fetchPACTracksAction,
 };
 //#endregion
 

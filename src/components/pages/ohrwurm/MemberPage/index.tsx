@@ -19,7 +19,7 @@ import {
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { UserState } from "../../../../store/types";
+import { UserState, OhrwurmState } from "../../../../store/types";
 //> Store Actions
 import { loginAction } from "../../../../store/actions/userActions";
 //> Service Registry
@@ -28,18 +28,45 @@ import Services from "../../../../serviceRegistry.json";
 import { Breadcrumbs } from "../../../atoms";
 import { LoginForm, ServiceGroup, MemberTable } from "../../../molecules";
 import { MemberModal } from "../../../organisms/modals";
+import {
+  addMemberAction,
+  deleteMemberAction,
+  fetchMembersAction,
+  updateMemberAction,
+} from "../../../../store/actions/ohrwurmActions";
 //#endregion
 
 //#region > Interfaces
 interface State {
   searchQuery: string;
   memberModal: boolean;
+  username: string;
+  editing: boolean;
 }
 interface OwnProps {}
 interface StateProps {
   user: UserState;
+  ohrwurm: OhrwurmState;
 }
-interface Props extends OwnProps, StateProps, RouteComponentProps {}
+interface DispatchProps {
+  fetchMembers: () => void;
+  addMember: (
+    username: string,
+    pacs?: string[],
+    isOhrwurmSupervisor?: boolean
+  ) => void;
+  deleteMember: (username: string) => void;
+  updateMember: (
+    username: string,
+    pacs?: string[],
+    isOhrwurmSupervisor?: boolean
+  ) => void;
+}
+interface Props
+  extends OwnProps,
+    StateProps,
+    DispatchProps,
+    RouteComponentProps {}
 //#endregion
 
 //#region > Components
@@ -48,19 +75,25 @@ class MemberPage extends React.Component<Props, State> {
   state: State = {
     searchQuery: "",
     memberModal: false,
+    username: "",
+    editing: false,
   };
 
-  deleteUser = () => {
-    alert();
+  componentDidMount = () => {
+    this.props.fetchMembers();
   };
 
-  editUser = () => {
-    alert();
+  deleteUser = async (username: string) => {
+    await this.props.deleteMember(username);
+  };
+
+  editUser = (username: string) => {
+    this.setState({ username });
+    this.toggleMemberModal();
   };
 
   search = (value: string) => {
     this.setState({ searchQuery: value });
-
     // Add search for users
   };
 
@@ -68,48 +101,59 @@ class MemberPage extends React.Component<Props, State> {
     this.setState({
       memberModal: !this.state.memberModal,
     });
+    if (this.state.memberModal) {
+      this.setState({ username: "" });
+    }
   };
 
   render() {
     return (
       <>
-        <MDBContainer>
-          <Breadcrumbs
-            crumbs={[
-              {
-                name: "Ohrwurm",
-                // onClick: () => this.switchForm("SERVICE"),
-              },
-              {
-                name: "Members management",
-                active: true,
-              },
-            ]}
-          ></Breadcrumbs>
-          <MDBRow>
-            <MDBCol size="11">
-              <MDBInput
-                hint="Search"
-                type="text"
-                value={this.state.searchQuery}
-                containerClass="active-pink active-pink-2 mt-0 mb-3"
-                onChange={(e: any) => this.search(e.target.value)}
-              />
-            </MDBCol>
-            <MDBCol size="1">
-              <MDBBtn flat onClick={() => this.toggleMemberModal()}>
-                <MDBIcon icon="plus" size="lg" className="blue-text" />
-              </MDBBtn>
-            </MDBCol>
-          </MDBRow>
-          <MemberTable
-            entries={[]}
-            onDeleteClick={() => this.deleteUser()}
-            onEditClick={() => this.editUser()}
-          ></MemberTable>
-        </MDBContainer>
+        <div id="base" className="mt-1">
+          <div className="ml-5 mr-5">
+            <Breadcrumbs
+              crumbs={[
+                {
+                  name: "Ohrwurm",
+                  onClick: () => this.props.history.push("/"),
+                },
+                {
+                  name: "Members management",
+                  active: true,
+                },
+              ]}
+            ></Breadcrumbs>
+            <MDBRow>
+              <MDBCol size="11">
+                <MDBInput
+                  disabled
+                  hint="Search"
+                  type="text"
+                  value={this.state.searchQuery}
+                  containerClass="active-pink active-pink-2 mt-0 mb-3"
+                  onChange={(e: any) => this.search(e.target.value)}
+                />
+              </MDBCol>
+              <MDBCol size="1">
+                <MDBBtn flat onClick={() => this.toggleMemberModal()}>
+                  <MDBIcon icon="plus" size="lg" className="blue-text" />
+                </MDBBtn>
+              </MDBCol>
+            </MDBRow>
+            <MemberTable
+              entries={this.props.ohrwurm.members?.items}
+              onDeleteClick={(username: string) => this.deleteUser(username)}
+              onEditClick={(username: string) => this.editUser(username)}
+            ></MemberTable>
+          </div>
+        </div>
         {this.state.memberModal && (
-          <MemberModal toggle={this.toggleMemberModal} />
+          <MemberModal
+            toggle={this.toggleMemberModal}
+            username={this.state.username}
+            addMember={this.props.addMember}
+            updateMember={this.props.updateMember}
+          />
         )}
       </>
     );
@@ -118,10 +162,17 @@ class MemberPage extends React.Component<Props, State> {
 //#endregion
 
 //#region > Redux Mapping
-const mapStateToProps = (state: RootState) => ({ user: state.user });
+const mapStateToProps = (state: RootState) => ({
+  user: state.user,
+  ohrwurm: state.ohrwurm,
+});
 
 const mapDispatchToProps = {
   login: loginAction,
+  fetchMembers: fetchMembersAction,
+  addMember: addMemberAction,
+  deleteMember: deleteMemberAction,
+  updateMember: updateMemberAction,
 };
 //#endregion
 
