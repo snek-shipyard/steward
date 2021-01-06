@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 
 //> Store Types
 import { RootState } from "../../../../store/reducers/index";
-import { OhrwurmState, Track, PAC } from "../../../../store/types";
+import { OhrwurmState, Track, PAC, Member } from "../../../../store/types";
 //> Store Actions
 import {
   fetchPACSAction,
@@ -39,6 +39,7 @@ interface State {
   members?: string[];
   searchQuery?: string;
   editing: boolean;
+  filteredMembers?: Member[];
 }
 interface OwnProps {}
 interface StateProps {
@@ -74,6 +75,7 @@ class ProjectModal extends React.Component<Props, State> {
     members: [],
     searchQuery: "",
     editing: false,
+    filteredMembers: [],
   };
 
   componentWillMount = () => {
@@ -92,6 +94,9 @@ class ProjectModal extends React.Component<Props, State> {
         }
       });
     }
+    this.setState({
+      filteredMembers: this.props.ohrwurm.members?.items,
+    });
   };
 
   setProjectName = (e: React.FormEvent<HTMLInputElement>): void => {
@@ -120,9 +125,15 @@ class ProjectModal extends React.Component<Props, State> {
   };
 
   search = (value: string) => {
-    this.setState({ searchQuery: value });
+    let filteredMembers = this.props.ohrwurm.members?.items || [];
 
-    // Add search for users
+    if (value !== "") {
+      filteredMembers = filteredMembers.filter((member) =>
+        member.username.toLowerCase().includes(value.toLowerCase())
+      );
+    }
+
+    this.setState({ searchQuery: value, filteredMembers });
   };
 
   onSubmit = async () => {
@@ -218,24 +229,22 @@ class ProjectModal extends React.Component<Props, State> {
                   />
                 </div>
                 <MDBListGroup>
-                  {(this.props.ohrwurm?.members?.items || []).map(
-                    (member, id) => {
-                      return (
-                        <MDBListGroupItem>
-                          <MDBInput
-                            type="checkbox"
-                            id={id.toString()}
-                            label={member.username}
-                            value={member.username}
-                            checked={this.checkChecked(member.username)}
-                            onChange={(e: React.FormEvent<HTMLInputElement>) =>
-                              this.setMembers(e)
-                            }
-                          />
-                        </MDBListGroupItem>
-                      );
-                    }
-                  )}
+                  {(this.state.filteredMembers || []).map((member, id) => {
+                    return (
+                      <MDBListGroupItem>
+                        <MDBInput
+                          type="checkbox"
+                          id={id.toString()}
+                          label={member.username}
+                          value={member.username}
+                          checked={this.checkChecked(member.username)}
+                          onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                            this.setMembers(e)
+                          }
+                        />
+                      </MDBListGroupItem>
+                    );
+                  })}
                 </MDBListGroup>
               </div>
               <div className="text-right mb-4 mt-5">
