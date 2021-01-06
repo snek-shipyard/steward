@@ -119,6 +119,10 @@ class MemberModal extends React.Component<Props, State> {
       await this.props.updateMember(username, pacs, isOhrwurmSupervisor);
     } else {
       await this.props.addMember(username, pacs, isOhrwurmSupervisor);
+
+      alert(
+        `Generated password for user ${username}: <${this.props.ohrwurm.members?.added?.generatedPassword}>`
+      );
     }
 
     this.props.toggle();
