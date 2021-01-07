@@ -176,11 +176,11 @@ class TrackModal extends React.Component<Props, State> {
       if (title === this.props.track?.title) {
         title = undefined;
       }
-      
+
       if (description === this.props.track?.description) {
         description = undefined;
       }
-      
+
       if (tags === this.props.track?.tags) {
         tags = undefined;
       }
@@ -413,5 +413,5 @@ export default withRouter(
 
 /**
  * SPDX-License-Identifier: (EUPL-1.2)
- * Copyright © 2019-2020 Nico Schett
+ * Copyright © 2020-2021 Nico Schett
  */
