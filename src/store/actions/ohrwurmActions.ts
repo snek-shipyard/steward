@@ -762,7 +762,7 @@ const updateTrackAction = (
         payload: {
           error: {
             errorCode: 999,
-            message: `Updating Member failed (${ex.message})`,
+            message: `Updating Track failed (${ex.message})`,
           },
           errorDetails: ex,
         },
@@ -815,7 +815,7 @@ const fetchMembersAction = (): ThunkAction<
         payload: {
           error: {
             errorCode: 999,
-            message: `Adding PAC failed (${ex.message})`,
+            message: `Fetching Members failed (${ex.message})`,
           },
           errorDetails: ex,
         },

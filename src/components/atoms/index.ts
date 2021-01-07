@@ -9,3 +9,8 @@ import ScrollToTop from "./ScrollToTop";
 //#region > Exports
 export { Breadcrumbs, Mailto, ScrollToTop };
 //#endregion
+
+/**
+ * SPDX-License-Identifier: (EUPL-1.2)
+ * Copyright © 2019-2020 Nico Schett
+ */
