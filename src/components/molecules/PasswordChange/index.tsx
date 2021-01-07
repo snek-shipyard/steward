@@ -125,11 +125,11 @@ class PasswordChangeForm extends React.Component<
     );
   }
 }
-#endregion
+//#endregion
 
-#region > Exports
+//#region > Exports
 export default PasswordChangeForm;
-#endregion
+//#endregion
 
 /**
  * SPDX-License-Identifier: (EUPL-1.2)

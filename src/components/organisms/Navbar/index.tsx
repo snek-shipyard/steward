@@ -31,7 +31,7 @@ import { logoutAction } from "../../../store/actions/userActions";
 import "./indes.scss";
 //> Logo
 import logo from "../../../assets/logo.png";
-#endregion
+//#endregion
 
 //#region > Interfaces
 interface State {
