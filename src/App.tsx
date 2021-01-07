@@ -33,7 +33,7 @@ const App = () => {
 
   return (
     <>
-      <Navbar></Navbar>
+      <Navbar />
       <div className="flyout">
         <main>
           <Routes />

@@ -27,6 +27,7 @@ import { UserState } from "./store/types";
 import { Ohrwurm } from "./components/organisms";
 //#endregion
 
+#region > Interfaces
 interface OwnProps {}
 interface StateProps {
   user: UserState;
@@ -37,6 +38,7 @@ interface Props
     StateProps,
     DispatchProps,
     RouteComponentProps {}
+#endregion
 
 //#region > Components
 /** @class Route component which includes all routes to specified components */

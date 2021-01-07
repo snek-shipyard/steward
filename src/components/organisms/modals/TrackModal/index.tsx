@@ -38,7 +38,6 @@ import {
   fetchPACSAction,
   fetchPACTracksAction,
 } from "../../../../store/actions/ohrwurmActions";
-
 //> Style Sheet
 import "./trackmodal.scss";
 //#endregion
@@ -177,9 +176,11 @@ class TrackModal extends React.Component<Props, State> {
       if (title === this.props.track?.title) {
         title = undefined;
       }
+      
       if (description === this.props.track?.description) {
         description = undefined;
       }
+      
       if (tags === this.props.track?.tags) {
         tags = undefined;
       }
