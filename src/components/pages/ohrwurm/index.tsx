@@ -36,6 +36,10 @@ class OhrwurmPage extends React.Component<Props, State> {
       this.props.history.push("/change-password");
     }
 
+    if (this.props.user.anonymous === true) {
+      this.props.history.push("/login");
+    }
+
     return (
       <>
         {this.props.user.anonymous === false && (

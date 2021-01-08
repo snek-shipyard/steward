@@ -134,7 +134,7 @@ const logoutAction = (): ThunkAction<
           error: ex,
         },
       });
-      
+
       return result;
     }
   };
@@ -188,7 +188,7 @@ const changePasswordAction = (
           errorDetails: ex,
         },
       });
-      
+
       return result;
     }
   };

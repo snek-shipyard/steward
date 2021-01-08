@@ -36,6 +36,9 @@ export interface UserState extends ErrorState {
   passwordChanged?: boolean;
   isOhrwurmSupervisor?: boolean;
   username?: string;
+  meta?: {
+    passwordSuccessfullyChanged?: boolean;
+  };
 }
 
 export type LoginAction = {

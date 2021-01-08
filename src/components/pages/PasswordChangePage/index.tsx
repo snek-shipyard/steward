@@ -39,13 +39,34 @@ interface Props
 //#region > Components
 /** @class This component displays the password change page */
 class PasswordChangePage extends React.Component<Props, State> {
+  componentDidMount = () => {
+    if (this.props.user.anonymous === true) {
+      this.props.history.push("/login");
+    }
+  };
+
+  componentDidUpdate = () => {
+    if (
+      this.props.user.anonymous === false &&
+      this.props.user.passwordChanged === false
+    ) {
+      this.props.history.push("/change-password");
+    }
+
+    if (this.props.user.anonymous === true) {
+      this.props.history.push("/login");
+    }
+  };
+
   submitPasswordChange = async (newPassword: string) => {
     this.props.changePassword(newPassword);
-    this.props.history.push("/");
   };
 
   render() {
-    if (this.props.user.anonymous === true) this.props.history.push("/login");
+    if (this.props.user.meta?.passwordSuccessfullyChanged) {
+      this.props.user.meta.passwordSuccessfullyChanged = false;
+      this.props.history.push("/");
+    }
 
     return (
       <div id="change-password" className="m-5">

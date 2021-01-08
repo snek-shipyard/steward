@@ -29,7 +29,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(loginAction());
-  });
+  }, []);
 
   return (
     <>

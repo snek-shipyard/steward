@@ -63,7 +63,6 @@ class Navbar extends React.Component<Props, State> {
 
   async logout() {
     this.props.logout();
-    this.props.history.push("/login");
   }
 
   render() {

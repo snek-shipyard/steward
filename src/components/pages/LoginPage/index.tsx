@@ -51,6 +51,18 @@ class LoginPage extends React.Component<Props, State> {
     activeForm: "SERVICE",
   };
 
+  componentDidMount = () => {
+    if (this.props.user.anonymous === false) {
+      this.props.history.push("/");
+    }
+  };
+
+  componentDidUpdate = () => {
+    if (this.props.user.anonymous === false) {
+      this.props.history.push("/");
+    }
+  };
+
   switchForm = (form: FormType) => {
     this.setState({ activeForm: form });
   };
@@ -66,12 +78,9 @@ class LoginPage extends React.Component<Props, State> {
 
   submitAuth = async (username: string, password: string) => {
     this.props.login({ username, password });
-    this.props.history.push("/");
   };
 
   render() {
-    if (this.props.user.anonymous === undefined) this.props.login();
-
     return (
       <div id="login" className="m-5">
         {this.props.user.anonymous === true && (

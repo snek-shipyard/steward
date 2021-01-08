@@ -8,6 +8,9 @@ const INIT_STATE: UserState = {
   anonymous: undefined,
   passwordChanged: undefined,
   username: undefined,
+  meta: {
+    passwordSuccessfullyChanged: false,
+  },
   error: undefined,
   errorDetails: undefined,
 };
@@ -55,9 +58,11 @@ const userReducer = (state = INIT_STATE, action: LoginAction): UserState => {
       return {
         ...state,
         passwordChanged: true,
+        meta: {
+          passwordSuccessfullyChanged: true,
+        },
       };
     case "USER_CHANGE_PASSWORD_FAILURE":
-      console.log("ERROR", payload);
       return {
         ...state,
         error: payload?.error,
