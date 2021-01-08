@@ -78,7 +78,11 @@ class Navbar extends React.Component<Props, State> {
           <MDBNavbarNav right>
             <MDBNavItem>
               <MDBDropdown>
-                <MDBDropdownToggle nav caret hidden={this.props.user.anonymous}>
+                <MDBDropdownToggle
+                  nav
+                  caret
+                  hidden={this.props.user.anonymous !== false}
+                >
                   <MDBIcon icon="user" />
                 </MDBDropdownToggle>
                 <MDBDropdownMenu right>
