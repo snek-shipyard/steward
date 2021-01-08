@@ -19,12 +19,9 @@ import { connect } from "react-redux";
 import { OhrwurmPage, OhrwurmMemberPage } from "./components/pages";
 import LoginPage from "./components/pages/LoginPage/index";
 import PasswordChangePage from "./components/pages/PasswordChangePage/index";
-import MemberPage from "./components/pages/ohrwurm/MemberPage";
 
 import { RootState } from "./store/reducers/index";
-import { ThunkDispatch } from "redux-thunk";
 import { UserState } from "./store/types";
-import { Ohrwurm } from "./components/organisms";
 //#endregion
 
 //#region > Interfaces
