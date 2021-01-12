@@ -1,0 +1,13 @@
+{
+  "ohrwurm": [
+    {
+      "url": "http://localhost:8000/graphql",
+      "title": "The first wurm",
+      "options": []
+    }, {
+      "url": "http://localhost:8000/graphql",
+      "title": "The second wurm",
+      "options": []
+    }
+  ]
+}

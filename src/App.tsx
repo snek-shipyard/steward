@@ -1,12 +1,19 @@
 //#region > Imports
 //> React
 // Contains all the functionality necessary to define React components
-import React from "react";
+import React, { useEffect } from "react";
+// DOM bindings for React Router
+import { withRouter } from "react-router-dom";
+//> Redux
+// Allows to React components read data from a Redux store, and dispatch actions
+// to the store to update data.
+import { useDispatch } from "react-redux";
 
 //> Components
-import { Footer, Navbar } from "./components/molecules";
 // Starts the page on top when reloaded or redirected
-import { ScrollToTop } from "./components/atoms";
+import { Navbar } from "./components/organisms";
+//> Store Actions
+import { loginAction } from "./store/actions/userActions";
 //> Stylesheet
 import "./App.css";
 //> Routes
@@ -18,24 +25,27 @@ import Routes from "./Routes";
  * @class Root component which loads all other components
  */
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(loginAction());
+  }, []);
+
   return (
     <>
-      <ScrollToTop>
-        <div className="flyout">
-          <Navbar />
-          <main>
-            <Routes />
-          </main>
-          <Footer />
-        </div>
-      </ScrollToTop>
+      <Navbar />
+      <div className="flyout">
+        <main>
+          <Routes />
+        </main>
+      </div>
     </>
   );
 };
 //#endregion
 
 //#region > Exports
-export default App;
+export default withRouter(App);
 //#endregion
 
 /**
